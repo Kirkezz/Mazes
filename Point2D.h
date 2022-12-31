@@ -1,6 +1,7 @@
 #pragma once
 #include <cmath>
 #include <concepts>
+#include <SFML/System/Vector2.hpp>
 template<typename T>
 struct Point2D {
 	T x, y;
@@ -34,6 +35,7 @@ struct Point2D {
 	bool operator==(const Point2D& rhs) const { return rhs.x == x && rhs.y == y; }
 	bool operator!=(const Point2D& rhs) const { return rhs.x != x || rhs.y != y; }
 	operator bool() const requires std::same_as<T, float> { return std::isfinite(x) && std::isfinite(y); }
+    operator sf::Vector2f() const requires std::same_as<T, float> { return sf::Vector2f(x, y); }
 };
 using Point2Du = Point2D<size_t>;
 using Point2Df = Point2D<float>;

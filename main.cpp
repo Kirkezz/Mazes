@@ -1,55 +1,72 @@
-﻿#include "Space.h"
-#include "SpaceRenderer.h"
+#include "Space.h"
 
+#include <algorithm>
 #include <iostream>
+#include <random>
+#include <ctime>
+#include <cmath>
+#include <set>
 using namespace std;
 
 #include <SFML/Graphics.hpp>
+#include "SpaceRenderer.h"
 using namespace sf;
 
-int main() {
-    RenderWindow window(VideoMode(768, 768), L"▦");
-    window.setFramerateLimit(30);
-    Space space(16, 16);
-    space.zigzag();
-    SpaceRenderer renderer(space, window);
-    renderer.pointSpeed = 8.f;
-    while (window.isOpen()) {
+#include <QtWidgets/QApplication>
+#include "spacegui.h"
+
+int main(int argc, char** argv) {
+    Space space(8, 8);
+    RenderWindow SFMLWindow(VideoMode(768, 768), L"▦");
+    SpaceRenderer renderer(space, SFMLWindow, Vector2f(64, 64));
+    QApplication app(argc, argv);
+    SpaceGUI QtWindow(space, renderer);
+    QtWindow.show();
+    while(SFMLWindow.isOpen()) {
+        if(!QtWindow.isVisible())
+            SFMLWindow.close();
+        Vector2f mouse;
         Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == Event::Closed) {
-                window.close();
-            }
-            else if (event.type == Event::KeyPressed) {
-                switch (event.key.code) {
-                case Keyboard::X:
-                    space.mirrorX();
-                    renderer.loadSpaceProps();
-                    break;
-                case Keyboard::Y:
-                    space.mirrorY();
-                    renderer.loadSpaceProps();
-                    break;
+        while(SFMLWindow.pollEvent(event)) {
+            if(event.type == Event::Closed)
+                SFMLWindow.close();
+            else if(event.type == Event::KeyPressed) {
+                switch(event.key.code) {
                 case Keyboard::Tab:
                     renderer.selectNextPoint();
                     break;
+                case Keyboard::Space:
+                    renderer.step();
                 default:
                     break;
                 }
             }
-            else if (event.type == event.MouseButtonReleased) {
-                Vector2f mouse = window.mapPixelToCoords(Mouse::getPosition(window));
-                if (event.mouseButton.button == Mouse::Left) {
+            else if(event.type == event.MouseButtonPressed) {
+                mouse = SFMLWindow.mapPixelToCoords(Mouse::getPosition(SFMLWindow));
+                if(event.mouseButton.button == Mouse::Left) {
+                    renderer.LMBPressed(Point2Df(mouse.x, mouse.y));
+                }
+                else if(event.mouseButton.button == Mouse::Right) {
+                    renderer.RMBPressed(Point2Df(mouse.x, mouse.y));
+                }
+            }
+            else if(event.type == event.MouseButtonReleased) {
+                mouse = SFMLWindow.mapPixelToCoords(Mouse::getPosition(SFMLWindow));
+                if(event.mouseButton.button == Mouse::Left) {
                     renderer.LMBReleased(Point2Df(mouse.x, mouse.y));
                 }
-                else if (event.mouseButton.button == Mouse::Right) {
+                else if(event.mouseButton.button == Mouse::Right) {
                     renderer.RMBReleased(Point2Df(mouse.x, mouse.y));
+                }
+                else if(event.mouseButton.button == Mouse::Middle) {
+                    renderer.MMBReleased(Point2Df(mouse.x, mouse.y));
                 }
             }
         }
-        window.clear();
+        SFMLWindow.clear();
         renderer.update();
         renderer.draw();
-        window.display();
+        SFMLWindow.display();
+        app.processEvents();
     }
 }

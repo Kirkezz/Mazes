@@ -10,10 +10,10 @@ public:
     void addPoint(Point2Df p);
     void constructPath(float speed = 1.0f); // pixels per frame
     Point2Df getNextCoordinates();
+    static float distance(Point2Df a, Point2Df b);
+    static Point2Df abs(Point2Df p);
 private:
     Point2Df coords;
     std::list<Point2Df> checkpoints;
     std::list<Point2Df> path;
-    float distance(Point2Df a, Point2Df b);
-    Point2Df abs(Point2Df p);
 };
