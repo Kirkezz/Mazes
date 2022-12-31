@@ -7,7 +7,7 @@ using namespace sf;
 void SpaceRenderer::preInit() {
     defaultPoint.s.setFillColor(pointsColor);
     defaultPoint.s.setOutlineColor(outlineColor);
-    font.loadFromFile("/home/kirkezz/SpaceFillingCurves/arial_bolditalicmt.ttf");
+    font.loadFromFile("arial_bolditalicmt.ttf");
     valueAsText.setFont(font);
     valueAsText.setFillColor(Color(127, 127, 127));
 }
