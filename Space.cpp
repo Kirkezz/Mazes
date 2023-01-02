@@ -1,4 +1,4 @@
-﻿#include "Space.h"
+#include "Space.h"
 #include <algorithm>
 #include <ranges>
 #include <deque>
@@ -30,15 +30,11 @@ std::vector<Node>& Space::getField() { return field; }
 Point2Du Space::get2DCoordinates(size_t i) { return Point2Du(i % width, i / width); }
 size_t Space::get1DCoordinates(Point2Du p) { return p.x + p.y * width; }
 bool Space::link(size_t i, size_t with, bool endOfStep) {
-    if(stepByStepFilling) {
-        stepList.push_back({{min(i, with), max(i, with)}, {NaN, NaN}, endOfStep});
-    }
+    addStep({i, with}, LINK, endOfStep);
     return (field[i].next.insert(with).second && field[with].next.insert(i).second);
 }
 bool Space::unlink(size_t i, size_t with, bool endOfStep) {
-    if(stepByStepFilling) {
-        stepList.push_back({{min(i, with), max(i, with)}, {NaN, NaN}, endOfStep, true});
-    }
+    addStep({i, with}, UNLINK, endOfStep);
     return (field[i].next.erase(with) && field[with].next.erase(i));
 }
 void Space::disintegrate(size_t i) {
@@ -93,9 +89,9 @@ void Space::zigzag() {
         while(a-- && moveFrom(pos, dirs[i % 4])) { }
     }
 }
-Space::selectRandomDirRT Space::selectRandomDir(size_t i, function<bool(size_t)> condition) {
+Space::selectRandomDirRT Space::selectRandomDir(size_t i, function<bool(size_t)> condition, bool shuffle) {
     static array dirs = {RIGHT, DOWN, LEFT, UP};
-    shuffle(dirs.begin(), dirs.end(), dre);
+    if(shuffle) std::shuffle(dirs.begin(), dirs.end(), dre);
     for(size_t j = 0, result; j < dirs.size(); ++j) {
         if(!wall(i, dirs[j]) && condition(result = offset(i, dirs[j]))) {
             return { result, dirs[j] };
@@ -108,51 +104,53 @@ void Space::recursiveBacktrackerMaze() {
     size_t begin = ud(dre), cur;
     deque<size_t> points({begin});
     vector<bool> visited(size(), false);
-    if(stepByStepFilling) stepList.push_back({{NaN}, {points.front(), 1}});
+    addStep({points.front(), 1}, SETVALUE);
     while(!points.empty()) {
         visited[cur = points.front()] = true;
         auto randDir = selectRandomDir(cur, [&](size_t i){return !visited[i];});
         if(randDir.dir != NaN) {
             points.push_front(randDir.next);
             link(cur, points.front());
-            if(stepByStepFilling) stepList.back().valueChanged = {points.front(), 1};
+            addStep({points.front(), 1}, SETVALUE);
         } else {
-            if(stepByStepFilling) stepList.push_back({{NaN}, {points.front(), 2}});
+            addStep({points.front(), 2}, SETVALUE);
             points.pop_front();
         }
     }
 }
 void Space::EllersMaze() {
     uniform_real_distribution<> ud(0.0, 1.0);
+    vector<size_t> thisLine(width, 0), nextLine(width, 0);
     size_t n = 0;
     for(size_t i = 0; i < height; ++i) {
-        for(size_t j = width * i; j < width * (i + 1); ++j)
-            if(!field[j].value)
-                field[j].value = ++n;
-        for(size_t j = width * i; j < width * (i + 1) - 1; ++j) {
-            if((i == height - 1 || ud(dre) < EllersMazeVerticalProbability) && field[j].value != field[j + 1].value) {
-                link(j, j + 1);
-                for(size_t c = width * i, t = field[j + 1].value; c < width * (i + 1); ++c)
-                    if(field[c].value == t)
-                        field[c].value = field[j].value;
+        for(size_t j = 0; j < width; ++j)
+            if(!thisLine[j])
+                thisLine[j] = ++n;
+        for(size_t j = 0; j < width - 1; ++j) {
+            if((i == height - 1 || ud(dre) < EllersMazeVerticalProbability) && thisLine[j] != thisLine[j + 1]) {
+                link(i * width + j, i * width + j + 1);
+                for(size_t c = 0, t = thisLine[j + 1]; c < width; ++c)
+                    if(thisLine[c] == t)
+                        thisLine[c] = thisLine[j];
             }
         }
-        auto calcSameV = [&](size_t v) { size_t count = 0; for(size_t c = width * i; c < width * (i + 1); ++c) count += (field[c].value == v); return count; };
-        auto calcWalls = [&](size_t v) { size_t count = 0; for(size_t c = width * i; c < width * (i + 1); ++c) count += (field[c].value == v && field[c].linked(c + width)); return count; };
+        auto calcWalls = [&](size_t v) { for(size_t c = 0; c < width; ++c) if(thisLine[c] == v && thisLine[c] == nextLine[c]) return true; return false; };
         if(i != height - 1) {
-            for(size_t j = width * i; j < width * (i + 1); ++j) {
-                if(ud(dre) < EllersMazeVerticalProbability || calcSameV(field[j].value) == 1) {
-                    link(j, j + width);
-                    field[j + width].value = field[j].value;
+            for(size_t j = 0; j < width; ++j) {
+                if(ud(dre) < EllersMazeVerticalProbability || count(thisLine.begin(), thisLine.end(), thisLine[j]) == 1) {
+                    link(i * width + j, (i + 1) * width + j);
+                    nextLine[j] = thisLine[j];
                 }
             }
-            for(size_t j = width * i; j < width * (i + 1); ++j) {
-                if(calcWalls(field[j].value) == 0) {
-                    link(j, j + width);
-                    field[j + width].value = field[j].value;
+            for(size_t j = 0; j < width; ++j) {
+                if(calcWalls(thisLine[j]) == 0) {
+                    link(i * width + j, (i + 1) * width + j);
+                    nextLine[j] = thisLine[j];
                 }
             }
         }
+        thisLine = move(nextLine);
+        nextLine.resize(width);
     }
 }
 void Space::KruskalsMaze() {
@@ -192,12 +190,12 @@ void Space::PrimsMaze() {
             size_t t = offset(index, dir);
             if(!wall(index, dir) && field[t].empty()) {
                 pre.insert(t);
-                if(stepByStepFilling) stepList.push_back({{NaN, NaN}, {t, 1}, false});
+                addStep({t, 1}, SETVALUE, false);
             }
         }
     };
     mark(cur);
-    if(stepByStepFilling) stepList.push_back({{NaN, NaN}, {cur, 2}, true});
+    addStep({cur, 2}, SETVALUE);
     while(!pre.empty()) {
         uniform_int_distribution<> udpre(0, pre.size() - 1);
         auto it = pre.begin();
@@ -205,11 +203,8 @@ void Space::PrimsMaze() {
         pre.erase(it);
         auto randDir = selectRandomDir(from, [&](size_t i){return (!field[i].empty() || i == cur);});
         if(randDir.next != NaN) {
-            link(from, randDir.next);
-            if(stepByStepFilling) {
-                stepList.back().valueChanged = {from, 2};
-                stepList.back().endOfStep = false;
-            }
+            link(from, randDir.next, false);
+            addStep({from, 2}, SETVALUE);
         }
         mark(from);
         if(stepByStepFilling) stepList.back().endOfStep = true;
@@ -254,57 +249,76 @@ void Space::recursiveDivisionMaze() {
 }
 void Space::AldousBroderMaze() {
     size_t pos = uniform_int_distribution<>(0, size() - 1)(dre), n = 0;
-    if(stepByStepFilling) stepList.push_back({{NaN, NaN}, {pos, 1}});
+    addStep({pos, 1}, SETVALUE);
     while(n != size() - 1) {
         size_t t = pos;
-        if(stepByStepFilling) stepList.push_back({{NaN, NaN}, {pos, 2}, false});
+        addStep({pos, 2}, SETVALUE, false);
         auto randDir = selectRandomDir(pos);
         pos = randDir.next;
         if(field[pos].empty()) {
             link(t, pos, false);
             ++n;
         }
-        if(stepByStepFilling) stepList.push_back({{NaN, NaN}, {pos, 1}, true});
+        addStep({pos, 1}, SETVALUE);
     }
 }
 void Space::WilsonsMaze() {
     uniform_int_distribution<> ud(0, size() - 1);
-    vector<uint8_t> vDir(size(), 0);
     size_t firstMazePart = ud(dre), begin, n = 0;
-    if(stepByStepFilling) stepList.push_back({{NaN, NaN}, {firstMazePart, 2}});
+    addStep({firstMazePart, 2}, SETVALUE);
     while(n != size() - 1) {
+        vector<uint8_t> vDir(size(), 0);
         do {
             begin = ud(dre);
         } while(!field[begin].empty() || begin == firstMazePart);
         size_t pos = begin;
         selectRandomDirRT randDir;
-        if(stepByStepFilling) stepList.push_back({{NaN, NaN}, {pos, 3}});
+        addStep({pos, 3}, SETVALUE);
         while(field[pos].empty() && pos != firstMazePart) {
             randDir = selectRandomDir(pos);
             vDir[pos] = randDir.dir;
-            if(stepByStepFilling) {
-                stepList.push_back({{NaN, NaN}, {pos, 1}, false});
-                stepList.push_back({{NaN, NaN}, {randDir.next, 3}});
-            }
+            addStep({pos, 1}, SETVALUE, false);
+            addStep({randDir.next, 3}, SETVALUE);
             pos = randDir.next;
         }
         pos = begin;
-        if(stepByStepFilling) stepList.push_back({{NaN, NaN}, {pos, 3}});
+        addStep({pos, 3}, SETVALUE);
         while(pos != randDir.next) {
             link(pos, offset(pos, vDir[pos]), false);
-            if(stepByStepFilling) {
-                stepList.back().valueChanged = {pos, 2};
-                stepList.push_back({{NaN, NaN}, {offset(pos, vDir[pos]), 3}});
-            }
+            addStep({pos, 2}, SETVALUE, false);
+            addStep({offset(pos, vDir[pos]), 3}, SETVALUE);
             pos = offset(pos, vDir[pos]);
             ++n;
         }
-        if(stepByStepFilling) { stepList.back().valueChanged.y = 2; stepList.back().endOfStep = true; }
-        for(size_t i = 0; i < size(); ++i) {
-            if(stepByStepFilling && field[i].empty()) { stepList.push_back({{NaN, NaN}, {i, 0}, false}); }
-            vDir[i] = false;
+        if(stepByStepFilling) {
+            stepList.back().stepValue.y = 2;
+            for(size_t i = 0; i < size(); ++i) {
+                if(field[i].empty()) { addStep({i, 0}, SETVALUE, false); }
+            }
+            stepList.back().endOfStep = true;
         }
-        if(stepByStepFilling) stepList.back().endOfStep = true;
+    }
+}
+void Space::huntAndKillMaze() {
+    size_t pos = uniform_int_distribution<>(0, size() - 1)(dre), lowerBound = pos;
+    vector<bool> visited(size(), false);
+    visited[pos] = true;
+    auto notVisited = [&](size_t i){return !visited[i];};
+    selectRandomDirRT randDir = selectRandomDir(pos, notVisited);
+    while(randDir.next != NaN) {
+        do {
+            link(pos, randDir.next);
+            pos = randDir.next;
+            visited[pos] = true;
+            if(pos < lowerBound) lowerBound = pos;
+            randDir = selectRandomDir(pos, notVisited);
+        } while(randDir.next != NaN);
+        for(size_t i = lowerBound; i < size(); ++i) {
+            if(visited[i] && (randDir = selectRandomDir(i, notVisited)).next != NaN) {
+                lowerBound = pos = i;
+                break;
+            }
+        }
     }
 }
 bool Space::wall(size_t i, size_t dir) {
@@ -465,6 +479,10 @@ void Space::connectEdges() {
 }
 void Space::splitEdges() {
 
+}
+void Space::addStep(Point2Du stepValue, size_t stepType, bool endOfStep) {
+    if(stepByStepFilling)
+        stepList.push_back({stepValue, stepType, endOfStep});
 }
 
 size_t Space::mirrorX(size_t i) {

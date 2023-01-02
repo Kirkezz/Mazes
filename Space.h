@@ -60,8 +60,9 @@ public:
     void recursiveDivisionMaze();
     void AldousBroderMaze();
     void WilsonsMaze();
+    void huntAndKillMaze();
     static constexpr std::array fillArr = {&Space::clear, &Space::horizontally, &Space::spiral, &Space::zigzag, &Space::recursiveBacktrackerMaze, &Space::EllersMaze, &Space::KruskalsMaze, &Space::PrimsMaze,
-                                           &Space::recursiveDivisionMaze, &Space::AldousBroderMaze, &Space::WilsonsMaze};
+                                           &Space::recursiveDivisionMaze, &Space::AldousBroderMaze, &Space::WilsonsMaze, &Space::huntAndKillMaze};
     bool wall(size_t i, size_t dir);
     size_t offset(size_t i, size_t dir);
     // traversing/pathfinding algorithms
@@ -77,11 +78,18 @@ public:
     void connectEdges();
     void splitEdges();
     bool stepByStepFilling = false;
+    enum StepTypes {
+        LINK = 0,
+        UNLINK = 1,
+        SETVALUE = 2
+    };
     struct Step {
-        Point2Du linked, valueChanged;
-        bool endOfStep = true, unlinked = false;
+        Point2Du stepValue;
+        size_t stepType;
+        bool endOfStep;
     };
     std::list<Step> stepList;
+    void addStep(Point2Du stepValue, size_t stepType, bool endOfStep = true);
 private:
     std::vector<Node> field; // undirected graph
     // get the mirrored coords for one point
@@ -112,7 +120,7 @@ private:
     size_t isBasicDir(size_t i, size_t with);
     size_t reverseDir(size_t dir);
     struct selectRandomDirRT { size_t next, dir; };
-    selectRandomDirRT selectRandomDir(size_t i, std::function<bool(size_t)> condition = [](size_t i){return true;});
+    selectRandomDirRT selectRandomDir(size_t i, std::function<bool(size_t)> condition = [](size_t i){return true;}, bool shuffle = true);
     std::random_device rd;
     std::default_random_engine dre;
 };

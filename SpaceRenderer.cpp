@@ -88,21 +88,25 @@ void SpaceRenderer::selectNextPoint() {
 }
 void SpaceRenderer::step(bool recursion) {
     static Clock spaceStepListTimer;
-    if(space.stepByStepFilling && !space.stepList.empty() && (manualStep || (spaceStepListTimer.getElapsedTime().asSeconds() > spaceStepListDelay || recursion))) {
+    if(space.stepByStepFilling && !space.stepList.empty() && (manualStep || (recursion || spaceStepListTimer.getElapsedTime().asSeconds() > spaceStepListDelay))) {
         spaceStepListTimer.restart();
+        space.stepByStepFilling = false;
         Space::Step s = space.stepList.front();
-        if(s.valueChanged != Space::NaN) {
-            space[s.valueChanged.x].value = s.valueChanged.y;
+        switch(s.stepType) {
+        case Space::LINK:
+            space.link(s.stepValue.x, s.stepValue.y);
+            break;
+        case Space::UNLINK:
+            space.unlink(s.stepValue.x, s.stepValue.y);
+            break;
+        case Space::SETVALUE:
+            space[s.stepValue.x].value = s.stepValue.y;
+            break;
         }
-        if(s.linked != Space::NaN) {
-            space.stepByStepFilling = false;
-            s.unlinked ? space.unlink(s.linked.x, s.linked.y) : space.link(s.linked.x, s.linked.y);
-            space.stepByStepFilling = true;
-        }
+        space.stepByStepFilling = true;
         space.stepList.pop_front();
-        if(!s.endOfStep) {
+        if(!s.endOfStep)
             step(true);
-        }
     }
 }
 void SpaceRenderer::update() {
