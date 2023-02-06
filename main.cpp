@@ -1,24 +1,23 @@
 #include "Space.h"
 
 #include <algorithm>
+#include <cmath>
+#include <ctime>
 #include <iostream>
 #include <random>
-#include <ctime>
-#include <cmath>
 #include <set>
 using namespace std;
 
-#include <SFML/Graphics.hpp>
 #include "SpaceRenderer.h"
+#include <SFML/Graphics.hpp>
 using namespace sf;
 
-#include <QtWidgets/QApplication>
 #include "spacegui.h"
-
+#include <QtWidgets/QApplication>
 int main(int argc, char** argv) {
-    Space space(8, 8);
-    RenderWindow SFMLWindow(VideoMode(768, 768), L"▦");
-    SpaceRenderer renderer(space, SFMLWindow, Vector2f(64, 64));
+    Space space(16, 16, Space::SQUARE);
+    RenderWindow SFMLWindow;
+    SpaceRenderer renderer(space, SFMLWindow, Vector2f(48, 48));
     QApplication app(argc, argv);
     SpaceGUI QtWindow(space, renderer);
     QtWindow.show();
@@ -40,30 +39,25 @@ int main(int argc, char** argv) {
                 default:
                     break;
                 }
-            }
-            else if(event.type == event.MouseButtonPressed) {
+            } else if(event.type == event.MouseButtonPressed) {
                 mouse = SFMLWindow.mapPixelToCoords(Mouse::getPosition(SFMLWindow));
                 if(event.mouseButton.button == Mouse::Left) {
-                    renderer.LMBPressed(Point2Df(mouse.x, mouse.y));
+                    renderer.LMBPressed(mouse);
+                } else if(event.mouseButton.button == Mouse::Right) {
+                    renderer.RMBPressed(mouse);
                 }
-                else if(event.mouseButton.button == Mouse::Right) {
-                    renderer.RMBPressed(Point2Df(mouse.x, mouse.y));
-                }
-            }
-            else if(event.type == event.MouseButtonReleased) {
+            } else if(event.type == event.MouseButtonReleased) {
                 mouse = SFMLWindow.mapPixelToCoords(Mouse::getPosition(SFMLWindow));
                 if(event.mouseButton.button == Mouse::Left) {
-                    renderer.LMBReleased(Point2Df(mouse.x, mouse.y));
-                }
-                else if(event.mouseButton.button == Mouse::Right) {
-                    renderer.RMBReleased(Point2Df(mouse.x, mouse.y));
-                }
-                else if(event.mouseButton.button == Mouse::Middle) {
-                    renderer.MMBReleased(Point2Df(mouse.x, mouse.y));
+                    renderer.LMBReleased(mouse);
+                } else if(event.mouseButton.button == Mouse::Right) {
+                    renderer.RMBReleased(mouse);
+                } else if(event.mouseButton.button == Mouse::Middle) {
+                    renderer.MMBReleased(mouse);
                 }
             }
         }
-        SFMLWindow.clear();
+        SFMLWindow.clear(renderer.backgroundColor);
         renderer.update();
         renderer.draw();
         SFMLWindow.display();

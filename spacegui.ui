@@ -6,20 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>256</width>
-    <height>512</height>
+    <width>384</width>
+    <height>768</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>256</width>
-    <height>512</height>
+    <width>384</width>
+    <height>768</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>256</width>
-    <height>512</height>
+    <width>384</width>
+    <height>768</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -39,379 +39,379 @@
        <attribute name="title">
         <string>Основное</string>
        </attribute>
-       <widget class="QLabel" name="labelX">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>5</y>
-          <width>58</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Столбцов</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="labelY">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>29</y>
-          <width>36</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Строк</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="apply">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>410</y>
-          <width>80</width>
-          <height>24</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Применить</string>
-        </property>
-       </widget>
-       <widget class="QSpinBox" name="spaceSpinBoxY">
-        <property name="geometry">
-         <rect>
-          <x>60</x>
-          <y>24</y>
-          <width>42</width>
-          <height>24</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Высота координатной сетки&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>256</number>
-        </property>
-        <property name="displayIntegerBase">
-         <number>10</number>
-        </property>
-       </widget>
-       <widget class="QSpinBox" name="spaceSpinBoxX">
-        <property name="geometry">
-         <rect>
-          <x>60</x>
-          <y>0</y>
-          <width>42</width>
-          <height>24</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ширина координатной сетки&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>256</number>
-        </property>
-        <property name="displayIntegerBase">
-         <number>10</number>
-        </property>
-       </widget>
-       <widget class="QSpinBox" name="spaceSpinBoxSizeX">
-        <property name="geometry">
-         <rect>
-          <x>190</x>
-          <y>0</y>
-          <width>42</width>
-          <height>24</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ширина квадрата координатной сетки&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="minimum">
-         <number>4</number>
-        </property>
-        <property name="maximum">
-         <number>256</number>
-        </property>
-        <property name="singleStep">
-         <number>8</number>
-        </property>
-        <property name="stepType">
-         <enum>QAbstractSpinBox::DefaultStepType</enum>
-        </property>
-        <property name="value">
-         <number>4</number>
-        </property>
-       </widget>
-       <widget class="QSpinBox" name="spaceSpinBoxSizeY">
-        <property name="geometry">
-         <rect>
-          <x>190</x>
-          <y>24</y>
-          <width>42</width>
-          <height>24</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Высота квадрата координатной сетки&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="minimum">
-         <number>4</number>
-        </property>
-        <property name="maximum">
-         <number>256</number>
-        </property>
-        <property name="singleStep">
-         <number>8</number>
-        </property>
-        <property name="stepType">
-         <enum>QAbstractSpinBox::DefaultStepType</enum>
-        </property>
-        <property name="value">
-         <number>4</number>
-        </property>
-       </widget>
-       <widget class="QLabel" name="labelWidth">
-        <property name="geometry">
-         <rect>
-          <x>130</x>
-          <y>29</y>
-          <width>55</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Ширина</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="labelHeight">
-        <property name="geometry">
-         <rect>
-          <x>130</x>
-          <y>5</y>
-          <width>56</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Высота</string>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="spaceFillingComboBox">
-        <property name="geometry">
-         <rect>
-          <x>81</x>
-          <y>48</y>
-          <width>151</width>
-          <height>24</height>
-         </rect>
-        </property>
-        <item>
-         <property name="text">
-          <string>Пустое</string>
-         </property>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0">
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Геометрия сетки</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="2" column="2">
+            <widget class="QSpinBox" name="SRHeight">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>1024</number>
+             </property>
+             <property name="singleStep">
+              <number>8</number>
+             </property>
+             <property name="value">
+              <number>48</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0" colspan="2">
+            <widget class="QLabel" name="label_5">
+             <property name="text">
+              <string>Высота ячейки</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="4">
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Строк</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="4">
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Столбцов</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1" colspan="5">
+            <widget class="QComboBox" name="tiling">
+             <item>
+              <property name="text">
+               <string>Прямоугольная (ортогональная)</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Шестиугольная (гексагональная)</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Диаграма Вороного</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>Тип</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" colspan="2">
+            <widget class="QLabel" name="label_4">
+             <property name="text">
+              <string>Ширина ячейки</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="5">
+            <widget class="QSpinBox" name="SParam1">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>2048</number>
+             </property>
+             <property name="value">
+              <number>16</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QSpinBox" name="SRWidth">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>2048</number>
+             </property>
+             <property name="singleStep">
+              <number>8</number>
+             </property>
+             <property name="value">
+              <number>48</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="5">
+            <widget class="QSpinBox" name="SParam2">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>2048</number>
+             </property>
+             <property name="value">
+              <number>16</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </item>
-        <item>
-         <property name="text">
-          <string>Горизонтальные линии (паттерн)</string>
-         </property>
+        <item row="1" column="0">
+         <widget class="QGroupBox" name="groupBox_2">
+          <property name="title">
+           <string>Настройки лабиринта</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>Интервал визуализации</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QDoubleSpinBox" name="mazeAlgDelay">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>Алгоритм построения</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QCheckBox" name="isSBSF">
+             <property name="text">
+              <string>Визуализировать</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="mazeAlg">
+             <property name="maximumSize">
+              <size>
+               <width>134</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <item>
+              <property name="text">
+               <string/>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Recursive backtracker</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Алгоритм Эллера</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Рандомизированный алгоритм Краскала</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Алгоритм Прима</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Рекурсивное деление</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Алгоритм Олдоса-Бродера</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Алгоритм Уилсона</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Hunt-and-Kill</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QPushButton" name="mazeInfo">
+             <property name="maximumSize">
+              <size>
+               <width>26</width>
+               <height>26</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>🛈</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1" colspan="2">
+            <widget class="QCheckBox" name="isManualStep">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>Построение на пробел</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </item>
-        <item>
-         <property name="text">
-          <string>Спираль (паттерн)</string>
-         </property>
+        <item row="2" column="0">
+         <widget class="QGroupBox" name="groupBox_4">
+          <property name="title">
+           <string>Настройки нахождения кратчайшего пути</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_4">
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="isPathAlgVisualization">
+             <property name="text">
+              <string>Визуализировать</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>Интервал визуализации</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QDoubleSpinBox" name="pathAlgDelay">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>185</width>
+               <height>16777215</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="pathAlg">
+             <item>
+              <property name="text">
+               <string>Поиск в ширину</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_8">
+             <property name="text">
+              <string>Алгоритм нахождения пути</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QPushButton" name="pathInfo">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>26</width>
+               <height>26</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>🛈</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </item>
-        <item>
-         <property name="text">
-          <string>Зигзаг (паттерн)</string>
-         </property>
+        <item row="3" column="0">
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="title">
+           <string>Отображение графических элементов</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="checkBox_2">
+             <property name="text">
+              <string>Сетка</string>
+             </property>
+             <property name="tristate">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="checkBox_5">
+             <property name="text">
+              <string>Ребра графа лабиринта</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="checkBox_3">
+             <property name="text">
+              <string>Кратчайший путь</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="checkBox_6">
+             <property name="text">
+              <string>Точки</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QCheckBox" name="checkBox_4">
+             <property name="text">
+              <string>Стены лабиринта</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QCheckBox" name="checkBox_7">
+             <property name="text">
+              <string>Отладочная информация</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </item>
-        <item>
-         <property name="text">
-          <string>Recursive backtracker (лабиринт)</string>
-         </property>
+        <item row="4" column="0">
+         <widget class="QPushButton" name="apply">
+          <property name="text">
+           <string>Применить</string>
+          </property>
+         </widget>
         </item>
-        <item>
-         <property name="text">
-          <string>Алгоритм Эллера (лабиринт)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Рандомизированный алгоритм Краскала (лабиринт)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Рандомизированный алгоритм Прима (лабиринт)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Рекурсивное деление (лабиринт)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Алгоритм Олдоса-Бродера (лабиринт)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Алгоритм Уилсона (лабиринт)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Алгоритм Hunt-and-Kill (лабиринт)</string>
-         </property>
-        </item>
-       </widget>
-       <widget class="QLabel" name="labelFilling">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>53</y>
-          <width>74</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Заполнение</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="spaceButtonMirrorY">
-        <property name="geometry">
-         <rect>
-          <x>138</x>
-          <y>75</y>
-          <width>94</width>
-          <height>24</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Отразить по Y</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="spaceButtonMirrorX">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>75</y>
-          <width>95</width>
-          <height>24</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Отразить по X</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="labelLinkQueueSpeed">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>125</y>
-          <width>163</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Скорость построения (сек.)</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="spaceCheckBoxSBSFilling">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>103</y>
-          <width>210</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Пошаговое построение линии</string>
-        </property>
-       </widget>
-       <widget class="QDoubleSpinBox" name="spaceSpinBoxStepListDelay">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="geometry">
-         <rect>
-          <x>170</x>
-          <y>120</y>
-          <width>62</width>
-          <height>24</height>
-         </rect>
-        </property>
-        <property name="decimals">
-         <number>3</number>
-        </property>
-        <property name="minimum">
-         <double>0.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>10.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="stepType">
-         <enum>QAbstractSpinBox::DefaultStepType</enum>
-        </property>
-        <property name="value">
-         <double>0.100000000000000</double>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="maze">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>169</y>
-          <width>207</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Отображать стены лабиринта</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="manualStep">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>147</y>
-          <width>163</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Построение на пробел</string>
-        </property>
-       </widget>
-       <widget class="QCheckBox" name="lines">
-        <property name="geometry">
-         <rect>
-          <x>0</x>
-          <y>191</y>
-          <width>141</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Отображать линии</string>
-        </property>
-       </widget>
+       </layout>
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">

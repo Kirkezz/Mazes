@@ -23,7 +23,7 @@ void PointAnimation::constructPath(float speed) {
             path.push_front(t);
             ++i;
         } while(distance(t, b) >= speed);
-        a = move(b);
+        a = std::move(b);
     }
 }
 Point2Df PointAnimation::getNextCoordinates() {

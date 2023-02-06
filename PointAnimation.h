@@ -1,9 +1,9 @@
 #pragma once
 #include "Point2D.h"
-#include <string>
 #include <cmath>
 #include <list>
 #include <map>
+#include <string>
 class PointAnimation {
 public:
     PointAnimation();
