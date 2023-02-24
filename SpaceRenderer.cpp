@@ -12,7 +12,7 @@ void SpaceRenderer::loadSpaceProps(Vector2f newShapeSize) {
     bool shapeSizeChanged = shapeSize != newShapeSize, tilingChanged = _tiling != space.tiling();
     if(shapeSizeChanged) {
         shapeSize = newShapeSize;
-        valueAsText.setCharacterSize(space.tiling() == Space::AMORPHOUS ? (6 /*temp value*/) : min(shapeSize.x, shapeSize.y) / 6);
+        valueAsText.setCharacterSize(space.tiling() == Space::AMORPHOUS ? (9 /*temp value*/) : min(shapeSize.x, shapeSize.y) / 6);
         samplePoint.s.setRadius(space.tiling() == Space::AMORPHOUS ? (6 /*temp value*/) : min(shapeSize.x, shapeSize.y) / 8.0f);
         samplePoint.s.setOrigin(samplePoint.s.getRadius(), samplePoint.s.getRadius());
     }
@@ -36,8 +36,6 @@ void SpaceRenderer::loadSpaceProps(Vector2f newShapeSize) {
     if(shapeSizeChanged || tilingChanged || shapes.size() != space.size() || _tiling == Space::AMORPHOUS) {
         shapes.clear();
         ConvexShape shape;
-        shape.setOutlineColor(outlineColor);
-        shape.setFillColor(shapeColor);
         if(_tiling != Space::AMORPHOUS) {
             shapes.resize(space.size());
             for(size_t i = 0; i < space.size(); ++i) {
@@ -46,9 +44,7 @@ void SpaceRenderer::loadSpaceProps(Vector2f newShapeSize) {
                     double angle = degreesToRadians(360 / space.tiling() * i - 180 / space.tiling());
                     shape.setPoint(i, Vector2f(1 + cos(angle) * shapeSize.x / 2, 1 + sin(angle) * shapeSize.y / 2));
                 }
-                shape.setOutlineThickness(0);
                 shape.setScale(shapeSize.x / shape.getLocalBounds().width, shapeSize.y / shape.getLocalBounds().height);
-                shape.setOutlineThickness(outlineThickness);
                 shape.setPosition(get2DWindowCoordinates(i));
                 shapes[i] = shape;
             }
@@ -75,10 +71,12 @@ void SpaceRenderer::loadSpaceProps(Vector2f newShapeSize) {
             }
         }
     }
+    colors.clear();
+    colors.resize(space.size());
+    space.calcWeightFunc = [&](size_t a, size_t b) { return Point2Df(shapes[a].getPosition()).distance(Point2Df(shapes[b].getPosition())); };
 }
 SpaceRenderer::SpaceRenderer(Space& space, RenderWindow& window, Vector2f shapeSize) : space(space), window(window) {
-    samplePoint.s.setFillColor(pointsColor);
-    samplePoint.s.setOutlineColor(outlineColor);
+    samplePoint.s.setOutlineColor(colorScheme[OUTLINECOLOR]);
     font.loadFromFile("arial_bolditalicmt.ttf");
     valueAsText.setFont(font);
     valueAsText.setFillColor(Color::Green);
@@ -89,8 +87,11 @@ void SpaceRenderer::update() {
         Point2Df p = i.PA.getNextCoordinates();
         i.s.setPosition(p ? p : shapes[i.end].getPosition());
     }
-    if(!manualStep)
-        step();
+    if(!manualFillStep)
+        fillStep();
+    if(!manualPathStep) {
+        pathStep();
+    }
 }
 bool isGridDrawn = true, isCurveDrawn = true, isPathDrawn = true, isPointsDrawn = true, isDebugInfoDrawn = true, isMazeDrawn = false;
 void SpaceRenderer::draw() {
@@ -114,7 +115,7 @@ void SpaceRenderer::LMBReleased(Vector2f pos) {
         return;
     if(lastLMBPressed == p) {
         addPoint(shapes[p].getPosition());
-    } else if(!space.stepByStepFilling) {
+    } else if(!space.stepByStepFill) {
         space.link(lastLMBPressed, p);
     }
 }
@@ -124,27 +125,38 @@ void SpaceRenderer::RMBReleased(Vector2f pos) {
     if(lastRMBPressed == Space::NaN || p == Space::NaN)
         return;
     if(lastRMBPressed == p && selectedPoint != Space::NaN) {
-        path = space.BFSfind(points[selectedPoint].end, p);
+        for(size_t i = 0; i < space.size(); ++i) {
+            colors[i] = DEFAULTCOLOR;
+        }
+        space.prePathAlgInit();
+        path = (space.*(space.pathArr[selectedPathAlg]))(points[selectedPoint].end, p);
+        space.defaultAllValues();
         points[selectedPoint].end = p;
         for(auto i : path) {
             points[selectedPoint].PA.addPoint(Point2Df(shapes[i].getPosition()));
         }
         points[selectedPoint].PA.constructPath(pointSpeed);
-    } else if(!space.stepByStepFilling) {
+    } else if(!space.stepByStepFill) {
         space.unlink(lastRMBPressed, p);
     }
 }
 void SpaceRenderer::MMBReleased(Vector2f pos) {
-    if(size_t p = mouseTo1DSpaceCoordinates(pos); p != Space::NaN && !space.stepByStepFilling)
+    if(size_t p = mouseTo1DSpaceCoordinates(pos); p != Space::NaN && !space.stepByStepFill)
         space.disintegrate(p);
 }
-void SpaceRenderer::selectNextPoint() {}
-void SpaceRenderer::step(bool recursion) {
-    static Clock spaceStepListTimer;
-    if(space.stepByStepFilling && (manualStep || spaceStepListTimer.getElapsedTime().asSeconds() > spaceStepListDelay || recursion)) {
-        spaceStepListTimer.restart();
-        space.stepByStepFilling = false;
-        auto s = space.getNextStep();
+void SpaceRenderer::selectNextPoint() {
+    if(points.empty())
+        return;
+    if(selectedPoint != Space::NaN)
+        points[selectedPoint].s.setOutlineThickness(0);
+    points[++selectedPoint %= points.size()].s.setOutlineThickness(outlineThickness);
+}
+void SpaceRenderer::fillStep(bool recursion) {
+    static Clock spaceFillStepListTimer;
+    if(space.stepByStepFill && (manualFillStep || spaceFillStepListTimer.getElapsedTime().asSeconds() > spaceFillStepListDelay || recursion)) {
+        spaceFillStepListTimer.restart();
+        space.stepByStepFill = false;
+        auto s = space.getNextFillStep();
         if(s) {
             switch(s->stepType) {
             case Space::LINK:
@@ -153,35 +165,50 @@ void SpaceRenderer::step(bool recursion) {
             case Space::UNLINK:
                 space.unlink(s->stepValue.x, s->stepValue.y);
                 break;
-            case Space::SETVALUE:
+            case Space::SETCOLOR:
+                colors[s->stepValue.x] = s->stepValue.y;
+                break;
+            case Space::SETVALUE1:
                 space[s->stepValue.x].values[0] = s->stepValue.y;
                 break;
+            case Space::SETVALUE2:
+                space[s->stepValue.x].values[1] = s->stepValue.y;
+                break;
+            case Space::SETVALUE3:
+                space[s->stepValue.x].values[2] = s->stepValue.y;
+                break;
+            default:
+                break;
             }
-            space.stepByStepFilling = true;
+            space.stepByStepFill = true;
             if(!s->endOfStep)
-                step(true);
+                fillStep(true);
         }
     }
-};
+}
+void SpaceRenderer::pathStep(bool recursion) {
+    static Clock spacePathStepListTimer;
+    if(space.stepByStepPath && (manualPathStep || spacePathStepListTimer.getElapsedTime().asSeconds() > spacePathStepListDelay || recursion)) {
+        spacePathStepListTimer.restart();
+        auto s = space.getNextPathStep();
+        if(s) {
+            if(s->stepType == Space::SETCOLOR)
+                colors[s->stepValue.x] = s->stepValue.y;
+            else if(s->stepType == Space::SETNEXTPATH)
+                path = space.getNextPath();
+            else
+                space[s->stepValue.x].values[s->stepType] = s->stepValue.y;
+            if(!s->endOfStep)
+                pathStep(true);
+        }
+    }
+}
 // private
 void SpaceRenderer::drawGrid() {
     for(size_t i = 0; i < shapes.size(); ++i) {
-        if(space.stepByStepFilling) {
-            switch(space[i].values[0]) {
-            case 1:
-                shapes[i].setFillColor(Color::White);
-                break;
-            case 2:
-                shapes[i].setFillColor(Color::Blue);
-                break;
-            case 3:
-                shapes[i].setFillColor(Color(173, 255, 152));
-                break;
-            default:
-                shapes[i].setFillColor(shapeColor);
-                break;
-            }
-        }
+        shapes[i].setOutlineColor(colorScheme[OUTLINECOLOR]);
+        shapes[i].setOutlineThickness(outlineThickness);
+        shapes[i].setFillColor(colorScheme[colors[i]]);
         window.draw(shapes[i]);
     }
 }
@@ -215,15 +242,16 @@ void SpaceRenderer::drawCurve() {
     for(size_t i = 0; i < space.size(); ++i)
         for(size_t j : space[i].next)
             if(i < j)
-                drawThickSpaceLine(i, j, curveThickness, curveColor);
+                drawThickSpaceLine(i, j, curveThickness, colorScheme[CURVECOLOR]);
 }
 void SpaceRenderer::drawPath() {
     size_t current = *path.begin();
     for(auto it = path.begin(); it != path.end(); current = *it, ++it) {
-        drawThickSpaceLine(current, *it, pathThickness, pathColor);
+        drawThickSpaceLine(current, *it, pathThickness, colorScheme[PATHCOLOR]);
     }
 }
 void SpaceRenderer::addPoint(Vector2f p) {
+    samplePoint.s.setFillColor(colorScheme[POINTSCOLOR]);
     points.push_back(samplePoint);
     points.back().s.setPosition(p);
     points.back().end = mouseTo1DSpaceCoordinates(p);
@@ -244,6 +272,7 @@ void SpaceRenderer::drawValues() {
                 valueAsText.setOrigin((valueAsText.getLocalBounds().left + valueAsText.getLocalBounds().width) / 2,
                                       (valueAsText.getLocalBounds().height + valueAsText.getLocalBounds().height) / 2);
                 valueAsText.setPosition(getValueCoordinates(i, j));
+                // valueAsText.setPosition(getValueCoordinates(i, j == 0 ? 0 : j == 1 ? (shapes[i].getPointCount()) / 2 : shapes[i].getPointCount() - 1));
                 window.draw(valueAsText);
             }
         }
@@ -255,7 +284,7 @@ void SpaceRenderer::drawMaze() {
             if(size_t offset = space[i].offset(j); (offset == Space::NaN || !space[i].linked(offset)) && i < offset) {
                 Point2Df p1 = Point2Df(shapes[i].getPoint(j)) * Point2Df(shapes[i].getScale()) + Point2Df(shapes[i].getPosition()),
                          p2 = Point2Df(shapes[i].getPoint((j + 1) % shapes[i].getPointCount())) * Point2Df(shapes[i].getScale()) + Point2Df(shapes[i].getPosition());
-                drawThickLine(p1, p2, mazeThickness, mazeColor);
+                drawThickLine(p1, p2, mazeThickness, colorScheme[MAZECOLOR]);
             }
 }
 // helper functions

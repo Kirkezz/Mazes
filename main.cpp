@@ -35,7 +35,12 @@ int main(int argc, char** argv) {
                     renderer.selectNextPoint();
                     break;
                 case Keyboard::Space:
-                    renderer.step();
+                    renderer.fillStep();
+                    renderer.pathStep();
+                    break;
+                case Keyboard::F:
+                    space.floodFill();
+                    break;
                 default:
                     break;
                 }
@@ -57,7 +62,7 @@ int main(int argc, char** argv) {
                 }
             }
         }
-        SFMLWindow.clear(renderer.backgroundColor);
+        SFMLWindow.clear(renderer.colorScheme[SpaceRenderer::BACKGROUNDCOLOR]);
         renderer.update();
         renderer.draw();
         SFMLWindow.display();

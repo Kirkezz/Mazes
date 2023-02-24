@@ -21,7 +21,7 @@
 #include <boost/polygon/voronoi.hpp>
 class Space {
 public:
-    const static size_t NaN = -1;
+    const static size_t NaN = -1, MAX_VALUES = 3;
     enum TilingType { AMORPHOUS = 0, TRIANGLE = 3, SQUARE = 4, HEXAGON = 6 };
     void resize(size_t newWidth, size_t newHeight, TilingType newTiling);
     typedef boost::polygon::point_data<int> VPoint;
@@ -29,7 +29,7 @@ public:
     boost::polygon::voronoi_diagram<double> vd;
     std::vector<VPoint> VoronoiPoints;
     Point2Du VoronoiWindowSize;
-    float minDistForEdgeAdjacency = 10.f;
+    float minDistForEdgeAdjacency = 5.f;
     void resize(Point2Df windowSize, int smoothness = 3); // for AMORPHOUS tiling
     Space(size_t width, size_t height, TilingType tiling = SQUARE);
     size_t size() const;
@@ -47,19 +47,25 @@ public:
     Node& operator()(Point2Du p);
     Point2Du get2DCoordinates(size_t i) const;
     size_t get1DCoordinates(Point2Du p) const;
-    bool stepByStepFilling = false;
-    enum StepType { LINK = 0, UNLINK = 1, SETVALUE = 2 };
+    bool stepByStepFill = false, stepByStepPath = false;
+    enum StepType { SETVALUE1 = 0, SETVALUE2, SETVALUE3, SETCOLOR, LINK, UNLINK, SETNEXTPATH };
     struct Step {
         Point2Du stepValue;
         StepType stepType;
         bool endOfStep;
     };
-    std::list<Step> stepList;
-    std::optional<Step> getNextStep();
+    std::list<Step> fillStepList;
+    std::optional<Step> getNextFillStep();
+    std::list<Step> pathStepList;
+    std::optional<Step> getNextPathStep();
+    std::list<size_t> getNextPath();
+    void defaultAllValues();
+    void prePathAlgInit();
     std::random_device rd;
     std::default_random_engine dre;
     // filling algorithms
     void clear();
+    void floodFill();
     void horizontally();
     void recursiveBacktrackerMaze();
     double EllersMazeVerticalProbability = 0.5;
@@ -74,13 +80,16 @@ public:
                                            &Space::PrimsMaze,      &Space::recursiveDivisionMaze,    &Space::AldousBroderMaze, &Space::WilsonsMaze,
                                            &Space::huntAndKillMaze};
     // traversing/pathfinding algorithms
-    std::vector<size_t> BFS(size_t from);
-    std::list<size_t> BFSfind(size_t from, size_t to);
+    std::list<size_t> BFSFind(size_t from, size_t to);
+    std::function<float(size_t, size_t)> calcWeightFunc; // user-defined function
+    std::list<size_t> AStarFind(size_t from, size_t to);
     void DFS(size_t from);
+    static constexpr std::array pathArr = {&Space::BFSFind, &Space::AStarFind};
 private:
     TilingType _tiling;
     size_t _width, _height;
-    void addStep(Point2Du stepValue, StepType stepType, bool endOfStep = true);
+    void addFillStep(Point2Du stepValue, StepType stepType, bool endOfStep = true);
+    void addPathStep(Point2Du stepValue, StepType stepType, bool endOfStep = true);
     struct Node {
         Node(size_t i);
         virtual ~Node() {}
@@ -91,8 +100,8 @@ private:
         bool link(size_t with);
         std::set<size_t>::size_type unlink(size_t with);
         std::set<size_t> next;
-        static const int8_t defaultValue;
-        std::vector<int8_t> values;
+        static const size_t defaultValue;
+        std::vector<size_t> values;
         size_t i;
         static Space* space;
     };
@@ -142,4 +151,9 @@ private:
         size_t i, std::function<bool(size_t)> condition = [](size_t i) { return true; });
     std::optional<Point2Df> lineSegmentsIntersection(Point2Df AV0, Point2Df AV1, Point2Df BV0, Point2Df BV1);
     Point2Df lineWindowIntersection(Point2Df AV0, Point2Df AV1, Point2Df windowSize);
+    // void visualizePath(const std::list<size_t>& path);
+    void setValue(size_t i, size_t vi, size_t v, bool endOfStep = true);
+    std::list<std::list<size_t>> paths;
+    void addPath(std::list<size_t> path);
+    std::list<size_t> constructPath(const std::vector<size_t>& parent, size_t from, size_t to);
 };

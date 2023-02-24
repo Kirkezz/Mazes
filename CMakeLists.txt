@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
-
-project(Mazes VERSION 0.4 LANGUAGES CXX)
+project(Mazes VERSION 0.5 LANGUAGES CXX)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_AUTOUIC ON)
@@ -12,8 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
-find_package(SFML COMPONENTS window graphics REQUIRED)
-find_package(CGAL REQUIRED COMPONENTS Core)
+find_package(SFML COMPONENTS system window graphics REQUIRED)
 find_package(Boost 1.40 COMPONENTS program_options REQUIRED)
 
 set(PROJECT_SOURCES
@@ -53,7 +51,7 @@ else()
     endif()
 endif()
 
-target_link_libraries(Mazes PRIVATE Qt${QT_VERSION_MAJOR}::Widgets PUBLIC sfml-window sfml-graphics CGAL::CGAL CGAL::CGAL_Core Boost::program_options)
+target_link_libraries(Mazes PRIVATE Qt${QT_VERSION_MAJOR}::Widgets PUBLIC sfml-window sfml-graphics Boost::program_options)
 
 set_target_properties(Mazes PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

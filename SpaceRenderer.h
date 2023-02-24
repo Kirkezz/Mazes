@@ -21,20 +21,26 @@ public:
     void RMBReleased(sf::Vector2f pos);
     void MMBReleased(sf::Vector2f pos);
     void selectNextPoint(); // Keyboard::Tab
-    bool manualStep = false;
-    float spaceStepListDelay = 0.5f;
-    void step(bool recursion = false); // manualStep ? Keyboard::Space : every spaceStepListDelay seconds
+    bool manualFillStep = false, manualPathStep = false;
+    float spaceFillStepListDelay = 0.f, spacePathStepListDelay = 0.f;
+    // manualStep ? Keyboard::Space : every spaceStepListDelay seconds
+    void fillStep(bool recursion = false);
+    void pathStep(bool recursion = false);
     // customisation
+    enum ColorScheme { DEFAULTCOLOR = 0, COLOR1, COLOR2, COLOR3, COLOR4, OUTLINECOLOR, CURVECOLOR, PATHCOLOR, MAZECOLOR, BACKGROUNDCOLOR, POINTSCOLOR, NUM_COLORS };
+    std::array<sf::Color, NUM_COLORS> colorScheme = {sf::Color(0, 30, 50),   sf::Color::White,        sf::Color::Blue,         sf::Color(173, 255, 152),
+                                                     sf::Color::Magenta,     sf::Color(26, 113, 185), sf::Color(255, 42, 109), sf::Color(223, 101, 148),
+                                                     sf::Color(5, 217, 232), sf::Color(1, 25, 15),    sf::Color(255, 42, 109)};
     float outlineThickness = 2.0f, curveThickness = 2.0f, pathThickness = 3.0f, pointSpeed = 8.0f, mazeThickness = 2.0f;
-    sf::Color shapeColor = sf::Color(0, 30, 50), outlineColor = sf::Color(26, 113, 185), curveColor = sf::Color(255, 42, 109), pathColor = sf::Color(223, 101, 148),
-              mazeColor = sf::Color(5, 217, 232), backgroundColor = sf::Color(1, 25, 15), pointsColor = curveColor;
     std::vector<sf::ConvexShape> shapes;
+    size_t selectedPathAlg = 0;
     std::list<size_t> path;
 private:
     size_t _tiling;
     Space& space;
     sf::RenderWindow& window;
     sf::Vector2f shapeSize;
+    std::vector<int8_t> colors;
     void drawGrid();
     void drawCurve();
     void drawPath();

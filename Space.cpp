@@ -74,6 +74,9 @@ void Space::resize(Point2Df windowSize, int smoothness) {
     }
     grid.clear();
     grid.reserve(VoronoiPoints.size());
+    // "All the site objects are constructed and sorted at the algorithm
+    // initialization step". I sort it before, because I want to get point by
+    // cell->source_index
     sort(VoronoiPoints.begin(), VoronoiPoints.end());
     boost::polygon::construct_voronoi(VoronoiPoints.begin(), VoronoiPoints.end(), segments.begin(), segments.end(), &vd);
     for(auto& cell : vd.cells()) {
@@ -104,11 +107,11 @@ Space::TilingType Space::tiling() const { return _tiling; }
 size_t Space::width() const { return _width; }
 size_t Space::height() const { return _height; }
 bool Space::link(size_t i, size_t with, bool endOfStep) {
-    addStep({i, with}, LINK, endOfStep);
+    addFillStep({i, with}, LINK, endOfStep);
     return grid[i]->link(with) && grid[with]->link(i);
 }
 bool Space::unlink(size_t i, size_t with, bool endOfStep) {
-    addStep({i, with}, UNLINK, endOfStep);
+    addFillStep({i, with}, UNLINK, endOfStep);
     return grid[i]->unlink(with) && grid[with]->unlink(i);
 }
 void Space::disintegrate(size_t i) {
@@ -138,17 +141,49 @@ size_t Space::get1DCoordinates(Point2Du p) const {
         return NaN;
     }
 }
-optional<Space::Step> Space::getNextStep() {
-    if(!stepList.empty()) {
-        Step t = stepList.front();
-        stepList.pop_front();
+optional<Space::Step> Space::getNextFillStep() {
+    if(!fillStepList.empty()) {
+        Step t = fillStepList.front();
+        fillStepList.pop_front();
         return t;
     }
     return {};
 }
+std::optional<Space::Step> Space::getNextPathStep() {
+    if(!pathStepList.empty()) {
+        Step t = pathStepList.front();
+        pathStepList.pop_front();
+        return t;
+    }
+    return {};
+}
+std::list<size_t> Space::getNextPath() {
+    std::list<size_t> t = paths.front();
+    paths.pop_front();
+    return t;
+}
+void Space::defaultAllValues() {
+    for(auto& i : grid) {
+        i->values.assign(MAX_VALUES, Node::defaultValue);
+    }
+}
+void Space::prePathAlgInit() {
+    pathStepList.clear();
+    defaultAllValues();
+    paths.clear();
+}
 void Space::clear() {
     for(size_t i = 0; i < size(); ++i)
         disintegrate(i);
+}
+void Space::floodFill() {
+    for(auto& i : grid) {
+        for(auto& j : i->getAvailableDirs()) {
+            if(size_t next = i->offset(j); next != NaN) {
+                link(i->i, next);
+            }
+        }
+    }
 }
 void Space::horizontally() {
     size_t pos = 0;
@@ -165,16 +200,16 @@ void Space::recursiveBacktrackerMaze() {
     size_t begin = 0, cur;
     deque<size_t> points({begin});
     vector<bool> visited(size(), false);
-    addStep({points.front(), 1}, SETVALUE);
+    addFillStep({points.front(), 1}, SETCOLOR);
     while(!points.empty()) {
         visited[cur = points.front()] = true;
         auto randDir = selectRandomDir(cur, [&](size_t i) { return !visited[i]; });
         if(randDir.dir != NaN) {
             points.push_front(randDir.next);
             link(cur, points.front(), false);
-            addStep({points.front(), 1}, SETVALUE);
+            addFillStep({points.front(), 1}, SETCOLOR);
         } else {
-            addStep({points.front(), 2}, SETVALUE);
+            addFillStep({points.front(), 2}, SETCOLOR);
             points.pop_front();
         }
     }
@@ -253,12 +288,12 @@ void Space::PrimsMaze() {
         for(auto dir : dirs) {
             if(size_t t = grid[index]->offset(dir); t != NaN && grid[t]->empty()) {
                 pre.insert(t);
-                addStep({t, 1}, SETVALUE, false);
+                addFillStep({t, 1}, SETCOLOR, false);
             }
         }
     };
     mark(cur);
-    addStep({cur, 2}, SETVALUE);
+    addFillStep({cur, 2}, SETCOLOR);
     while(!pre.empty()) {
         uniform_int_distribution<> udpre(0, pre.size() - 1);
         auto it = pre.begin();
@@ -267,11 +302,11 @@ void Space::PrimsMaze() {
         auto randDir = selectRandomDir(from, [&](size_t i) { return (!grid[i]->empty() || i == cur); });
         if(randDir.next != NaN) {
             link(from, randDir.next, false);
-            addStep({from, 2}, SETVALUE);
+            addFillStep({from, 2}, SETCOLOR);
         }
         mark(from);
-        if(stepByStepFilling)
-            stepList.back().endOfStep = true;
+        if(stepByStepFill)
+            fillStepList.back().endOfStep = true;
     }
 }
 void Space::recursiveDivisionMaze() {
@@ -313,23 +348,23 @@ void Space::recursiveDivisionMaze() {
 }
 void Space::AldousBroderMaze() {
     size_t pos = uniform_int_distribution<>(0, size() - 1)(dre), n = 0;
-    addStep({pos, 1}, SETVALUE);
+    addFillStep({pos, 1}, SETCOLOR);
     while(n != size() - 1) {
         size_t t = pos;
-        addStep({pos, 2}, SETVALUE, false);
+        addFillStep({pos, 2}, SETCOLOR, false);
         auto randDir = selectRandomDir(pos);
         pos = randDir.next;
         if(grid[pos]->empty()) {
             link(t, pos, false);
             ++n;
         }
-        addStep({pos, 1}, SETVALUE);
+        addFillStep({pos, 1}, SETCOLOR);
     }
 }
 void Space::WilsonsMaze() {
     uniform_int_distribution<> ud(0, size() - 1);
     size_t firstMazePart = ud(dre), begin, n = 0;
-    addStep({firstMazePart, 2}, SETVALUE);
+    addFillStep({firstMazePart, 2}, SETCOLOR);
     while(n != size() - 1) {
         vector<uint8_t> vDir(size(), 0);
         do {
@@ -337,31 +372,31 @@ void Space::WilsonsMaze() {
         } while(!grid[begin]->empty() || begin == firstMazePart);
         size_t pos = begin;
         selectRandomDirRT randDir;
-        addStep({pos, 3}, SETVALUE);
+        addFillStep({pos, 3}, SETCOLOR);
         while(grid[pos]->empty() && pos != firstMazePart) {
             randDir = selectRandomDir(pos);
             vDir[pos] = randDir.dir;
-            addStep({pos, 1}, SETVALUE, false);
-            addStep({randDir.next, 3}, SETVALUE);
+            addFillStep({pos, 1}, SETCOLOR, false);
+            addFillStep({randDir.next, 3}, SETCOLOR);
             pos = randDir.next;
         }
         pos = begin;
-        addStep({pos, 3}, SETVALUE);
+        addFillStep({pos, 3}, SETCOLOR);
         while(pos != randDir.next) {
             link(pos, grid[pos]->offset(vDir[pos]), false);
-            addStep({pos, 2}, SETVALUE, false);
-            addStep({grid[pos]->offset(vDir[pos]), 3}, SETVALUE);
+            addFillStep({pos, 2}, SETCOLOR, false);
+            addFillStep({grid[pos]->offset(vDir[pos]), 3}, SETCOLOR);
             pos = grid[pos]->offset(vDir[pos]);
             ++n;
         }
-        if(stepByStepFilling) {
-            stepList.back().stepValue.y = 2;
+        if(stepByStepFill) {
+            fillStepList.back().stepValue.y = 2;
             for(size_t i = 0; i < size(); ++i) {
                 if(grid[i]->empty()) {
-                    addStep({i, 0}, SETVALUE, false);
+                    addFillStep({i, 0}, SETCOLOR, false);
                 }
             }
-            stepList.back().endOfStep = true;
+            fillStepList.back().endOfStep = true;
         }
     }
 }
@@ -388,35 +423,90 @@ void Space::huntAndKillMaze() {
         }
     }
 }
-vector<size_t> Space::BFS(size_t from) {
+list<size_t> Space::BFSFind(size_t from, size_t to) {
+    if(from == to)
+        return {};
     vector<bool> discovered(size(), false);
+    discovered[from] = true;
     vector<size_t> parent(size(), -1);
-    deque<size_t> d({from});
+    deque<size_t> d({NaN, from});
     while(!d.empty()) {
         size_t back = d.back();
         d.pop_back();
-        discovered[back] = true;
+        if(back == NaN) {
+            if(!d.empty()) {
+                d.push_front(size_t(NaN));
+                pathStepList.back().endOfStep = true;
+            }
+            continue;
+        }
         for(auto i : grid[back]->next) {
             if(!discovered[i]) {
                 d.push_front(i);
                 parent[i] = back;
+                addPathStep({i, 1}, SETCOLOR, false);
                 discovered[i] = true;
+                if(i == to) {
+                    list<size_t> result;
+                    while(from != to) {
+                        result.push_front(to);
+                        if(parent[to] == -1)
+                            return {};
+                        to = parent[to];
+                    }
+                    result.push_front(from);
+                    // visualizePath(result);
+                    return result;
+                }
             }
         }
     }
-    return parent;
+    return {};
 }
-list<size_t> Space::BFSfind(size_t from, size_t to) {
-    auto parent = BFS(from);
-    list<size_t> result;
-    while(from != to) {
-        result.push_front(to);
-        if(parent[to] == -1)
-            return {};
-        to = parent[to];
+std::list<size_t> Space::AStarFind(size_t from, size_t to) {
+    if(from == to)
+        return {};
+    enum Costs { G = 1, H = 2, F = 0 };
+    size_t current;
+    vector<size_t> parent(size(), -1), open;
+    open.reserve(size());
+    open.push_back(from);
+    setValue(from, G, 0, false);
+    vector<bool> closed(size(), false);
+    while(1) {
+        // Looking for an element from the open deque whose cost F is minimal or with an equal cost, H is minimal
+        size_t min = NaN;
+        for(auto it = open.begin(); it != open.end(); ++it) {
+            if(!closed[*it] && ((min == NaN) || ((grid[*it]->values[F] < grid[min]->values[F] ||
+                                                  (grid[*it]->values[F] == grid[min]->values[F] && grid[*it]->values[H] < grid[min]->values[H]))))) {
+                min = *it;
+            }
+        }
+        if(min == NaN)
+            break;
+        addPathStep({min, 2}, SETCOLOR);
+        closed[min] = true;
+        for(auto& i : grid[min]->next) { // fix: G cost wrong calculated (first calc)
+            if(closed[i])
+                continue;
+            if(auto t = grid[min]->values[G] + calcWeightFunc(min, i); grid[i]->values[G] == Node::defaultValue || grid[i]->values[G] > t) {
+                parent[i] = min;
+                setValue(i, G, t, false);                                       // G cost = distance from starting node
+                setValue(i, H, calcWeightFunc(to, i), false);                   // H cost (heuristic) = Euclidean distance (by default) from end node
+                setValue(i, F, grid[i]->values[G] + grid[i]->values[H], false); // F cost = G cost + H cost
+                addPathStep({i, 1}, SETCOLOR, false);
+                if(i == to) {
+                    auto t = constructPath(parent, from, to);
+                    addPath(t);
+                    // visualizePath(t);
+                    return t;
+                }
+                open.push_back(i);
+            }
+        }
+        addPath(constructPath(parent, from, min));
     }
-    result.push_front(from);
-    return result;
+    return {};
 }
 void Space::DFS(size_t from) {
     vector<bool> discovered(size(), false);
@@ -442,12 +532,16 @@ void Space::DFS(size_t from) {
     }
 }
 // private
-void Space::addStep(Point2Du stepValue, StepType stepType, bool endOfStep) {
-    if(stepByStepFilling)
-        stepList.push_back({stepValue, stepType, endOfStep});
+void Space::addFillStep(Point2Du stepValue, StepType stepType, bool endOfStep) {
+    if(stepByStepFill)
+        fillStepList.push_back({stepValue, stepType, endOfStep});
+}
+void Space::addPathStep(Point2Du stepValue, StepType stepType, bool endOfStep) {
+    if(stepByStepPath)
+        pathStepList.push_back({stepValue, stepType, endOfStep});
 }
 // Node
-Space::Node::Node(size_t i) : i(i) { values.resize(space->tiling(), defaultValue); }
+Space::Node::Node(size_t i) : i(i) { values.resize(Space::MAX_VALUES, defaultValue); }
 vector<size_t> Space::Node::getAvailableDirs() const {
     vector<size_t> result(space->_tiling);
     iota(result.begin(), result.end(), 0);
@@ -457,7 +551,7 @@ bool Space::Node::empty() const { return next.empty(); }
 bool Space::Node::linked(size_t with) const { return next.find(with) != next.end(); }
 bool Space::Node::link(size_t with) { return next.insert(with).second; }
 set<size_t>::size_type Space::Node::unlink(size_t with) { return next.erase(with); }
-const int8_t Space::Node::defaultValue = -128;
+const size_t Space::Node::defaultValue = Space::NaN;
 Space* Space::Node::space = nullptr;
 // SquareNode
 size_t Space::SquareNode::offset(size_t dir) const {
@@ -536,4 +630,37 @@ Point2Df Space::lineWindowIntersection(Point2Df AV0, Point2Df AV1, Point2Df wind
            : (result = lineSegmentsIntersection(AV0, AV1, Point2Df(windowSize.x, windowSize.y), Point2Df(0, windowSize.y))) ? *result
            : (result = lineSegmentsIntersection(AV0, AV1, Point2Df(0, windowSize.y), Point2Df(0, 0)))                       ? *result
                                                                                                                             : AV1;
+}
+/*void Space::visualizePath(const std::list<size_t>& path) {
+    if(stepByStepPath && !path.empty()) {
+        pathStepList.push_front({{path.back(), 3}, SETCOLOR, false});
+        size_t prev = *(path.rbegin());
+        for(auto it = ++path.rbegin(); it != path.rend(); ++it) {
+            addPathStep({prev, 2}, SETCOLOR, false);
+            addPathStep({*it, 3}, SETCOLOR);
+            prev = *it;
+        }
+        pathStepList.push_front({{path.front(), 4}, SETCOLOR});
+    }
+}*/
+void Space::setValue(size_t i, size_t vi, size_t v, bool endOfStep) {
+    addPathStep({i, v}, StepType(vi), endOfStep);
+    grid[i]->values[vi] = v;
+}
+void Space::addPath(std::list<size_t> path) {
+    if(stepByStepPath) {
+        paths.push_back(std::move(path));
+        addPathStep({}, SETNEXTPATH, false);
+    }
+}
+std::list<size_t> Space::constructPath(const std::vector<size_t>& parent, size_t from, size_t to) {
+    list<size_t> result;
+    while(from != to) {
+        result.push_front(to);
+        if(parent[to] == -1)
+            return {};
+        to = parent[to];
+    }
+    result.push_front(from);
+    return result;
 }
