@@ -486,7 +486,7 @@ std::list<size_t> Space::AStarFind(size_t from, size_t to) {
             break;
         addPathStep({min, 2}, SETCOLOR);
         closed[min] = true;
-        for(auto& i : grid[min]->next) { // fix: G cost wrong calculated (first calc)
+        for(auto& i : grid[min]->next) {
             if(closed[i])
                 continue;
             if(auto t = grid[min]->values[G] + calcWeightFunc(min, i); grid[i]->values[G] == Node::defaultValue || grid[i]->values[G] > t) {
