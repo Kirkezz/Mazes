@@ -77,7 +77,7 @@ void SpaceRenderer::loadSpaceProps(Vector2f newShapeSize) {
 }
 SpaceRenderer::SpaceRenderer(Space& space, RenderWindow& window, Vector2f shapeSize) : space(space), window(window) {
     samplePoint.s.setOutlineColor(colorScheme[OUTLINECOLOR]);
-    font.loadFromFile("arial_bolditalicmt.ttf");
+    font.loadFromFile("resources/arial_bolditalicmt.ttf");
     valueAsText.setFont(font);
     valueAsText.setFillColor(Color::Green);
     loadSpaceProps(shapeSize);
@@ -168,16 +168,8 @@ void SpaceRenderer::fillStep(bool recursion) {
             case Space::SETCOLOR:
                 colors[s->stepValue.x] = s->stepValue.y;
                 break;
-            case Space::SETVALUE1:
-                space[s->stepValue.x].values[0] = s->stepValue.y;
-                break;
-            case Space::SETVALUE2:
-                space[s->stepValue.x].values[1] = s->stepValue.y;
-                break;
-            case Space::SETVALUE3:
-                space[s->stepValue.x].values[2] = s->stepValue.y;
-                break;
             default:
+                space[s->stepValue.x].values[s->stepType] = s->stepValue.y;
                 break;
             }
             space.stepByStepFill = true;
@@ -188,6 +180,7 @@ void SpaceRenderer::fillStep(bool recursion) {
 }
 void SpaceRenderer::pathStep(bool recursion) {
     static Clock spacePathStepListTimer;
+    static int count = 0;
     if(space.stepByStepPath && (manualPathStep || spacePathStepListTimer.getElapsedTime().asSeconds() > spacePathStepListDelay || recursion)) {
         spacePathStepListTimer.restart();
         auto s = space.getNextPathStep();

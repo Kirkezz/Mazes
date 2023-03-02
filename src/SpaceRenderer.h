@@ -23,7 +23,9 @@ public:
     void selectNextPoint(); // Keyboard::Tab
     bool manualFillStep = false, manualPathStep = false;
     float spaceFillStepListDelay = 0.f, spacePathStepListDelay = 0.f;
-    // manualStep ? Keyboard::Space : every spaceStepListDelay seconds
+    // bool makeScr = false;
+    // int scrCount = 0;
+    //  manualStep ? Keyboard::Space : every spaceStepListDelay seconds
     void fillStep(bool recursion = false);
     void pathStep(bool recursion = false);
     // customisation
@@ -71,4 +73,11 @@ private:
     bool isPointInsideShape(Point2Df p, const sf::ConvexShape& shape) const;
     std::optional<Point2Df> lineSegmentsIntersection(Point2Df AV0, Point2Df AV1, Point2Df BV0, Point2Df BV1);
     Point2Df lineWindowIntersection(Point2Df AV0, Point2Df AV1);
+    // public:
+    // bool saveScreenshot(std::string filename) {
+    //     sf::Texture texture;
+    //     texture.create(window.getSize().x, window.getSize().y);
+    //     texture.update(window);
+    //     return texture.copyToImage().saveToFile(filename);
+    // }
 };

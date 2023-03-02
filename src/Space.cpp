@@ -447,16 +447,7 @@ list<size_t> Space::BFSFind(size_t from, size_t to) {
                 addPathStep({i, 1}, SETCOLOR, false);
                 discovered[i] = true;
                 if(i == to) {
-                    list<size_t> result;
-                    while(from != to) {
-                        result.push_front(to);
-                        if(parent[to] == -1)
-                            return {};
-                        to = parent[to];
-                    }
-                    result.push_front(from);
-                    // visualizePath(result);
-                    return result;
+                    return constructPath(parent, from, to);
                 }
             }
         }
@@ -491,8 +482,9 @@ std::list<size_t> Space::AStarFind(size_t from, size_t to) {
                 continue;
             if(auto t = grid[min]->values[G] + calcWeightFunc(min, i); grid[i]->values[G] == Node::defaultValue || grid[i]->values[G] > t) {
                 parent[i] = min;
-                setValue(i, G, t, false);                                       // G cost = distance from starting node
-                setValue(i, H, calcWeightFunc(to, i), false);                   // H cost (heuristic) = Euclidean distance (by default) from end node
+                setValue(i, G, t, false); // G cost = distance from starting node
+                if(grid[i]->values[H] == Node::defaultValue)
+                    setValue(i, H, calcWeightFunc(to, i), false);               // H cost (heuristic) = Euclidean distance (by default) from end node
                 setValue(i, F, grid[i]->values[G] + grid[i]->values[H], false); // F cost = G cost + H cost
                 addPathStep({i, 1}, SETCOLOR, false);
                 if(i == to) {

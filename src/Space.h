@@ -29,7 +29,7 @@ public:
     boost::polygon::voronoi_diagram<double> vd;
     std::vector<VPoint> VoronoiPoints;
     Point2Du VoronoiWindowSize;
-    float minDistForEdgeAdjacency = 5.f;
+    float minDistForEdgeAdjacency = 1.f;
     void resize(Point2Df windowSize, int smoothness = 3); // for AMORPHOUS tiling
     Space(size_t width, size_t height, TilingType tiling = SQUARE);
     size_t size() const;
