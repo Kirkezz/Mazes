@@ -6,7 +6,7 @@ Supported grids: rectangular, hexagonal, Voronoi diagram.
 
 Supported maze generation algorithms: Recursive Backtracker algorithm, Eller's algorithm, Kruskals algorithm, Prim's algorithm, recursive division algorithm, Aldous-Broder algorithm, Wilson's algorithm, Hunt-and-Kill algorithm.
 
-Supported pathfinding algorithms: width-finding, A*-finding.
+Supported pathfinding algorithms: BFS, A*.
 
 Interface languages supported: Russian, English (translation is not finished yet, but will be available soon).
 
