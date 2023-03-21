@@ -1,7 +1,8 @@
 #include "spacegui.h"
 #include "./ui_spacegui.h"
-#include <QColorDialog>
-#include <QFileDialog>
+#include <QtGui/QStandardItemModel>
+#include <QtWidgets/QColorDialog>
+#include <QtWidgets/QFileDialog>
 
 using namespace std;
 SpaceGUI::SpaceGUI(Space& space, SpaceRenderer& renderer, QWidget* parent) : QMainWindow(parent), ui(new Ui::SpaceGUI), space(space), renderer(renderer) {
@@ -14,17 +15,31 @@ SpaceGUI::SpaceGUI(Space& space, SpaceRenderer& renderer, QWidget* parent) : QMa
     loadCD(CustomizationData());
 }
 SpaceGUI::~SpaceGUI() { delete ui; }
+void SpaceGUI::update() {
+    if(!ui->SParam1->isEnabled()) {
+        ui->SParam1->setValue(renderer.shapes.size());
+    }
+}
 void SpaceGUI::on_tiling_currentIndexChanged(int index) {
-    if(index > 1) { // Space::AMORPHOUS
-        ui->label->setText(QString("Ячеек"));
-        ui->SParam1->setValue(256);
-        ui->label_2->setText(QString("Сглаживание"));
-        ui->SParam2->setValue(3);
+    if(index > 2 || index == 0) { // Space::AMORPHOUS
+        if(index == 0) {
+            ui->label->setText(QString("Столбцов"));
+            ui->SParam2->setValue(1);
+            ui->SParam2->setEnabled(0);
+            ui->label_2->setText(QString("Строк"));
+            ui->SParam1->setValue(1);
+            ui->SParam1->setEnabled(0);
+        } else {
+            ui->label->setText(QString("Ячеек"));
+            ui->SParam1->setValue(256);
+            ui->label_2->setText(QString("Сглаживание"));
+            ui->SParam2->setValue((index == 3) * 3);
+        }
         ui->label_4->setText(QString("Ширина окна"));
         ui->SRWidth->setValue(768);
         ui->label_5->setText(QString("Высота окна"));
         ui->SRHeight->setValue(768);
-    } else if(prevTilingIndex > 1) {
+    } else if(prevTilingIndex > 2 || prevTilingIndex == 0) {
         ui->label->setText(QString("Столбцов"));
         ui->SParam2->setValue(16);
         ui->label_2->setText(QString("Строк"));
@@ -34,26 +49,41 @@ void SpaceGUI::on_tiling_currentIndexChanged(int index) {
         ui->label_5->setText(QString("Высота ячейки"));
         ui->SRHeight->setValue(48);
     }
-    ui->SParam2->setMinimum(index < 2);
+    ui->SParam2->setMinimum(index < 3);
+    QStandardItemModel* model = qobject_cast<QStandardItemModel*>(ui->mazeAlg->model());
+    for(size_t j = 0; j < space.availableFillings[ui->tiling->currentIndex()].size(); ++j) {
+        QStandardItem* item = model->item(j);
+        item->setFlags(space.availableFillings[ui->tiling->currentIndex()][j] ? item->flags() | Qt::ItemIsEnabled : item->flags() & ~Qt::ItemIsEnabled);
+    }
+    if(!space.availableFillings[ui->tiling->currentIndex()][ui->mazeAlg->currentIndex()]) {
+        ui->mazeAlg->setCurrentIndex(0);
+    }
+    ui->SParam1->setEnabled(index != 4 && index != 0);
+    ui->SParam2->setEnabled(index != 0);
     prevTilingIndex = index;
 }
 void SpaceGUI::on_apply_clicked() {
-    switch(ui->tiling->currentIndex()) {
-    case 0:
+    size_t tiling = ui->tiling->currentIndex();
+    if(tiling == 0 || (tiling == 4 && renderer.getPointsSize() == 0)) {
+        space.resize(1, 1, Space::SQUARE);
+    } else if(tiling == 1) {
         space.resize(ui->SParam1->value(), ui->SParam2->value(), Space::SQUARE);
-        break;
-    case 1:
+    } else if(tiling == 2) {
         space.resize(ui->SParam1->value(), ui->SParam2->value(), Space::HEXAGON);
-        break;
-    case 2: // Space::AMORPHOUS (Voronoi)
+    } else if(tiling == 3 || tiling == 4) {
         space.VoronoiPoints.clear();
         space.VoronoiPoints.reserve(ui->SParam1->value());
-        for(size_t i = 0; i < ui->SParam1->value(); ++i) {
-            space.VoronoiPoints.push_back(
-                {uniform_int_distribution(0, ui->SRHeight->value())(space.dre), uniform_int_distribution(0, ui->SRWidth->value())(space.dre)});
+        if(ui->tiling->currentIndex() == 3) {
+            for(size_t i = 0; i < ui->SParam1->value(); ++i)
+                space.VoronoiPoints.push_back(
+                    {uniform_int_distribution(0, ui->SRHeight->value())(space.dre), uniform_int_distribution(0, ui->SRWidth->value())(space.dre)});
+        } else if(ui->tiling->currentIndex() == 4) {
+            auto points = renderer.getPoints();
+            for(auto& i : points)
+                space.VoronoiPoints.push_back({int(i.x), int(i.y)});
         }
-        space.resize(Point2Df(ui->SRWidth->value(), ui->SRHeight->value()), ui->SParam2->value());
-        break;
+        if(space.VoronoiPoints.size() > 2)
+            space.resize(Point2Df(ui->SRWidth->value(), ui->SRHeight->value()), ui->SParam2->value());
     }
     renderer.path.clear();
     space.fillStepList.clear();
@@ -106,6 +136,7 @@ void SpaceGUI::on_firstColorButton_clicked() { selectColor(ui->firstColorFrame, 
 void SpaceGUI::on_secondColorButton_clicked() { selectColor(ui->secondColorFrame, renderer.colorScheme[SpaceRenderer::COLOR2]); }
 void SpaceGUI::on_thirdColorButton_clicked() { selectColor(ui->thirdColorFrame, renderer.colorScheme[SpaceRenderer::COLOR3]); }
 void SpaceGUI::on_fourthColorButton_clicked() { selectColor(ui->fourthColorFrame, renderer.colorScheme[SpaceRenderer::COLOR4]); }
+void SpaceGUI::on_fifthColorButton_clicked() { selectColor(ui->fifthColorFrame, renderer.colorScheme[SpaceRenderer::TEXTCOLOR]); }
 void SpaceGUI::on_outlineThickness_valueChanged(double arg1) { renderer.outlineThickness = arg1; }
 void SpaceGUI::on_curveThickness_valueChanged(double arg1) { renderer.curveThickness = arg1; }
 void SpaceGUI::on_pathThickness_valueChanged(double arg1) { renderer.pathThickness = arg1; }
@@ -142,8 +173,18 @@ void SpaceGUI::loadCD(const CustomizationData& cd) {
     selectColor(ui->mazeColorFrame, renderer.colorScheme[SpaceRenderer::MAZECOLOR], temp_cast(cd.colors[8]));
     selectColor(ui->backgroundColorFrame, renderer.colorScheme[SpaceRenderer::BACKGROUNDCOLOR], temp_cast(cd.colors[9]));
     selectColor(ui->pointsColorFrame, renderer.colorScheme[SpaceRenderer::POINTSCOLOR], temp_cast(cd.colors[10]));
+    selectColor(ui->fifthColorFrame, renderer.colorScheme[SpaceRenderer::TEXTCOLOR], temp_cast(cd.colors[11]));
     ui->outlineThickness->setValue(cd.thicknesses[0]);
     ui->curveThickness->setValue(cd.thicknesses[1]);
     ui->pathThickness->setValue(cd.thicknesses[2]);
     ui->mazeThickness->setValue(cd.thicknesses[3]);
+}
+void SpaceGUI::on_mazeInfo_clicked() {
+    static const std::array filenames = {"RU_Nothing",           "RU_RecursiveBacktracker", "RU_Ellers",  "RU_Kruskals",     "RU_Prims",
+                                         "RU_RecursiveDevision", "RU_Aldous-Broder",        "RU_Wilsons", "RU_Hunt-and-Kill"};
+    QDesktopServices::openUrl(QUrl(QString("resources/") + QString(filenames[ui->mazeAlg->currentIndex()]) + QString(".pdf")));
+}
+void SpaceGUI::on_pathInfo_clicked() {
+    static const std::array filenames = {"RU_BFS", "RU_AStar"};
+    QDesktopServices::openUrl(QUrl(QString("resources/") + QString(filenames[ui->pathAlg->currentIndex()]) + QString(".pdf")));
 }

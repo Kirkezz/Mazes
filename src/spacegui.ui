@@ -102,6 +102,9 @@
           <layout class="QGridLayout" name="gridLayout_4">
            <item row="2" column="1">
             <widget class="QDoubleSpinBox" name="pathAlgDelay">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="sizePolicy">
               <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -172,6 +175,9 @@
            </item>
            <item row="1" column="1" colspan="2">
             <widget class="QCheckBox" name="isManualPathStep">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>Построение на пробел</string>
              </property>
@@ -281,6 +287,14 @@
            </item>
            <item row="0" column="1" colspan="5">
             <widget class="QComboBox" name="tiling">
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
+             <item>
+              <property name="text">
+               <string/>
+              </property>
+             </item>
              <item>
               <property name="text">
                <string>Прямоугольная (ортогональная)</string>
@@ -293,7 +307,12 @@
              </item>
              <item>
               <property name="text">
-               <string>Диаграма Вороного</string>
+               <string>Диаграма Вороного (случайно)</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Диаграма Вороного (по точкам)</string>
               </property>
              </item>
             </widget>
@@ -346,6 +365,12 @@
            </item>
            <item row="1" column="1">
             <widget class="QComboBox" name="mazeAlg">
+             <property name="minimumSize">
+              <size>
+               <width>169</width>
+               <height>0</height>
+              </size>
+             </property>
              <property name="maximumSize">
               <size>
                <width>134</width>
@@ -425,7 +450,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="tab_3">
        <attribute name="title">
         <string>Кастомизация</string>
        </attribute>
@@ -443,10 +468,54 @@
            <string>Цветовая палитра</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_6">
-           <item row="4" column="1">
-            <widget class="QPushButton" name="pointsColorButton">
+           <item row="0" column="0">
+            <widget class="QFrame" name="backgroundColorFrame">
+             <property name="minimumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QPushButton" name="backgroundColorButton">
              <property name="text">
-              <string>Изменить цвет точек</string>
+              <string>Изменить цвет фона</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QFrame" name="outlineColorFrame">
+             <property name="minimumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
              </property>
             </widget>
            </item>
@@ -454,79 +523,6 @@
             <widget class="QPushButton" name="outlineColorButton">
              <property name="text">
               <string>Изменить цвет линий сетки</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="1">
-            <widget class="QPushButton" name="shapeColorButton">
-             <property name="text">
-              <string>Цвет №0 (стандартный цвет сетки)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QFrame" name="pointsColorFrame">
-             <property name="minimumSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QFrame" name="pathColorFrame">
-             <property name="minimumSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QFrame" name="mazeColorFrame">
-             <property name="minimumSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
              </property>
             </widget>
            </item>
@@ -552,74 +548,15 @@
              </property>
             </widget>
            </item>
-           <item row="7" column="0">
-            <widget class="QFrame" name="firstColorFrame">
-             <property name="minimumSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
+           <item row="2" column="1">
+            <widget class="QPushButton" name="curveColorButton">
+             <property name="text">
+              <string>Изменить цвет рёбер графа лабиринта</string>
              </property>
             </widget>
            </item>
-           <item row="6" column="0">
-            <widget class="QFrame" name="shapeColorFrame">
-             <property name="minimumSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="9" column="0">
-            <widget class="QFrame" name="thirdColorFrame">
-             <property name="minimumSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="0">
-            <widget class="QFrame" name="secondColorFrame">
+           <item row="3" column="0">
+            <widget class="QFrame" name="mazeColorFrame">
              <property name="minimumSize">
               <size>
                <width>24</width>
@@ -647,17 +584,54 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QPushButton" name="curveColorButton">
-             <property name="text">
-              <string>Изменить цвет рёбер графа лабиринта</string>
+           <item row="4" column="0">
+            <widget class="QFrame" name="pointsColorFrame">
+             <property name="minimumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QPushButton" name="backgroundColorButton">
+           <item row="4" column="1">
+            <widget class="QPushButton" name="pointsColorButton">
              <property name="text">
-              <string>Изменить цвет фона</string>
+              <string>Изменить цвет точек</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QFrame" name="pathColorFrame">
+             <property name="minimumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
              </property>
             </widget>
            </item>
@@ -668,8 +642,37 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QFrame" name="backgroundColorFrame">
+           <item row="6" column="0">
+            <widget class="QFrame" name="shapeColorFrame">
+             <property name="minimumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QPushButton" name="shapeColorButton">
+             <property name="text">
+              <string>Цвет №0 (стандартный цвет сетки)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="0">
+            <widget class="QFrame" name="firstColorFrame">
              <property name="minimumSize">
               <size>
                <width>24</width>
@@ -697,30 +700,8 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QFrame" name="outlineColorFrame">
-             <property name="minimumSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>24</width>
-               <height>24</height>
-              </size>
-             </property>
-             <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="10" column="0">
-            <widget class="QFrame" name="fourthColorFrame">
+           <item row="8" column="0">
+            <widget class="QFrame" name="secondColorFrame">
              <property name="minimumSize">
               <size>
                <width>24</width>
@@ -748,6 +729,28 @@
              </property>
             </widget>
            </item>
+           <item row="9" column="0">
+            <widget class="QFrame" name="thirdColorFrame">
+             <property name="minimumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+            </widget>
+           </item>
            <item row="9" column="1">
             <widget class="QPushButton" name="thirdColorButton">
              <property name="text">
@@ -755,10 +758,61 @@
              </property>
             </widget>
            </item>
+           <item row="10" column="0">
+            <widget class="QFrame" name="fourthColorFrame">
+             <property name="minimumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+            </widget>
+           </item>
            <item row="10" column="1">
             <widget class="QPushButton" name="fourthColorButton">
              <property name="text">
               <string>Цвет визуализации №4</string>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="0">
+            <widget class="QFrame" name="fifthColorFrame">
+             <property name="minimumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::StyledPanel</enum>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="1">
+            <widget class="QPushButton" name="fifthColorButton">
+             <property name="text">
+              <string>Цвет отладочного текста</string>
              </property>
             </widget>
            </item>

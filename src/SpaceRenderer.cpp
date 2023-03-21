@@ -1,4 +1,6 @@
 ﻿#include "SpaceRenderer.h"
+#define _USE_MATH_DEFINES
+#include <math.h>
 using namespace std;
 using namespace sf;
 // public
@@ -12,8 +14,8 @@ void SpaceRenderer::loadSpaceProps(Vector2f newShapeSize) {
     bool shapeSizeChanged = shapeSize != newShapeSize, tilingChanged = _tiling != space.tiling();
     if(shapeSizeChanged) {
         shapeSize = newShapeSize;
-        valueAsText.setCharacterSize(space.tiling() == Space::AMORPHOUS ? (9 /*temp value*/) : min(shapeSize.x, shapeSize.y) / 6);
-        samplePoint.s.setRadius(space.tiling() == Space::AMORPHOUS ? (6 /*temp value*/) : min(shapeSize.x, shapeSize.y) / 8.0f);
+        valueAsText.setCharacterSize((space.tiling() == Space::AMORPHOUS) ? (8 /*temp value*/) : min(shapeSize.x, shapeSize.y) / 6);
+        samplePoint.s.setRadius((space.tiling() == Space::AMORPHOUS || space.size() == 1) ? (4 /*temp value*/) : min(shapeSize.x, shapeSize.y) / 8.0f);
         samplePoint.s.setOrigin(samplePoint.s.getRadius(), samplePoint.s.getRadius());
     }
     _tiling = space.tiling();
@@ -73,16 +75,28 @@ void SpaceRenderer::loadSpaceProps(Vector2f newShapeSize) {
     }
     colors.clear();
     colors.resize(space.size());
-    space.calcWeightFunc = [&](size_t a, size_t b) { return Point2Df(shapes[a].getPosition()).distance(Point2Df(shapes[b].getPosition())); };
+    parent.clear();
+    parent.resize(space.size(), -1);
+    if(_tiling == Space::SQUARE)
+        space.calcWeightFunc = [&](size_t a, size_t b) { // Manhattan distance
+            return (std::abs(int(a / space.width()) - int(b / space.width())) * shapeSize.x +
+                    std::abs(int(a % space.width()) - int(b % space.width())) * shapeSize.y);
+        };
+    else // Euclidean distance
+        space.calcWeightFunc = [&](size_t a, size_t b) { return Point2Df(shapes[a].getPosition()).distance(Point2Df(shapes[b].getPosition())); };
+    // TODO: http://theory.stanford.edu/~amitp/GameProgramming/Heuristics.html "Manhattan distance adapted to hexagonal grids."
 }
 SpaceRenderer::SpaceRenderer(Space& space, RenderWindow& window, Vector2f shapeSize) : space(space), window(window) {
-    samplePoint.s.setOutlineColor(colorScheme[OUTLINECOLOR]);
     font.loadFromFile("resources/arial_bolditalicmt.ttf");
     valueAsText.setFont(font);
-    valueAsText.setFillColor(Color::Green);
+    t_arrowR.loadFromFile("resources/arrowR.png");
+    s_arrowR.setTexture(t_arrowR);
+    s_arrowR.setOrigin(256, 256);
     loadSpaceProps(shapeSize);
 }
 void SpaceRenderer::update() {
+    if(space.size() == 1)
+        return;
     for(auto& i : points) {
         Point2Df p = i.PA.getNextCoordinates();
         i.s.setPosition(p ? p : shapes[i.end].getPosition());
@@ -104,7 +118,7 @@ void SpaceRenderer::draw() {
     if(isPointsDrawn)
         drawPoints();
     if(isDebugInfoDrawn)
-        drawValues();
+        drawDebugInfo();
     if(isMazeDrawn)
         drawMaze();
 }
@@ -114,7 +128,7 @@ void SpaceRenderer::LMBReleased(Vector2f pos) {
     if(lastLMBPressed == Space::NaN || p == Space::NaN)
         return;
     if(lastLMBPressed == p) {
-        addPoint(shapes[p].getPosition());
+        addPoint(space.size() == 1 ? Vector2f(pos) : shapes[p].getPosition());
     } else if(!space.stepByStepFill) {
         space.link(lastLMBPressed, p);
     }
@@ -124,10 +138,15 @@ void SpaceRenderer::RMBReleased(Vector2f pos) {
     size_t p = mouseTo1DSpaceCoordinates(pos);
     if(lastRMBPressed == Space::NaN || p == Space::NaN)
         return;
-    if(lastRMBPressed == p && selectedPoint != Space::NaN) {
+    if(space.size() == 1 && !points.empty()) {
+        deleteSelectedPoint();
+        addPoint(pos);
+    } else if(lastRMBPressed == p && selectedPoint != Space::NaN) {
         for(size_t i = 0; i < space.size(); ++i) {
             colors[i] = DEFAULTCOLOR;
         }
+        parent.clear();
+        parent.resize(space.size(), -1);
         space.prePathAlgInit();
         path = (space.*(space.pathArr[selectedPathAlg]))(points[selectedPoint].end, p);
         space.defaultAllValues();
@@ -141,13 +160,21 @@ void SpaceRenderer::RMBReleased(Vector2f pos) {
     }
 }
 void SpaceRenderer::MMBReleased(Vector2f pos) {
-    if(size_t p = mouseTo1DSpaceCoordinates(pos); p != Space::NaN && !space.stepByStepFill)
+    if(size_t p = mouseTo1DSpaceCoordinates(pos); p != Space::NaN && !space.stepByStepFill) {
         space.disintegrate(p);
+        colors[p] = DEFAULTCOLOR;
+        parent[p] = -1;
+    }
+}
+void SpaceRenderer::deleteSelectedPoint() {
+    if(selectedPoint < points.size())
+        points.erase(points.begin() + selectedPoint);
+    selectNextPoint();
 }
 void SpaceRenderer::selectNextPoint() {
     if(points.empty())
         return;
-    if(selectedPoint != Space::NaN)
+    if(selectedPoint < points.size())
         points[selectedPoint].s.setOutlineThickness(0);
     points[++selectedPoint %= points.size()].s.setOutlineThickness(outlineThickness);
 }
@@ -189,12 +216,23 @@ void SpaceRenderer::pathStep(bool recursion) {
                 colors[s->stepValue.x] = s->stepValue.y;
             else if(s->stepType == Space::SETNEXTPATH)
                 path = space.getNextPath();
+            else if(s->stepType == Space::SETPARENT)
+                parent[s->stepValue.x] = s->stepValue.y;
             else
                 space[s->stepValue.x].values[s->stepType] = s->stepValue.y;
             if(!s->endOfStep)
                 pathStep(true);
         }
     }
+}
+size_t SpaceRenderer::getPointsSize() { return points.size(); }
+vector<Point2Df> SpaceRenderer::getPoints() {
+    vector<Point2Df> result;
+    result.reserve(points.size());
+    for(auto& i : points) {
+        result.push_back(Point2Df(i.s.getPosition()));
+    }
+    return result;
 }
 // private
 void SpaceRenderer::drawGrid() {
@@ -231,6 +269,14 @@ void SpaceRenderer::drawThickSpaceLine(size_t a, size_t b, float thickness, Colo
         drawThickLine({centerAdjEdgePos.x, centerAdjEdgePos.y}, {bPos.x, bPos.y}, thickness, color);
     }
 }
+void SpaceRenderer::drawWindowBorders() { // palliative
+    static const std::array<Point2Du, 5> borders = {Point2Du(0, 0), Point2Du(1, 0), Point2Du(1, 1), Point2Du(0, 1)};
+    auto w = window.getSize();
+    for(size_t i = 0; i < 4; ++i) {
+        drawThickLine(Point2Df(w.x * borders[i].x, w.y * borders[i].y), Point2Df(w.x * borders[(i + 1) % 4].x, w.y * borders[(i + 1) % 4].y), outlineThickness * 2,
+                      colorScheme[MAZECOLOR]);
+    }
+}
 void SpaceRenderer::drawCurve() {
     for(size_t i = 0; i < space.size(); ++i)
         for(size_t j : space[i].next)
@@ -245,6 +291,7 @@ void SpaceRenderer::drawPath() {
 }
 void SpaceRenderer::addPoint(Vector2f p) {
     samplePoint.s.setFillColor(colorScheme[POINTSCOLOR]);
+    samplePoint.s.setOutlineColor(colorScheme[OUTLINECOLOR]);
     points.push_back(samplePoint);
     points.back().s.setPosition(p);
     points.back().end = mouseTo1DSpaceCoordinates(p);
@@ -257,17 +304,30 @@ void SpaceRenderer::drawPoints() {
     for(auto& i : points)
         window.draw(i.s);
 }
-void SpaceRenderer::drawValues() {
+void SpaceRenderer::drawDebugInfo() {
+    valueAsText.setFillColor(colorScheme[TEXTCOLOR]);
     for(size_t i = 0; i < space.size(); ++i) {
         for(size_t j = 0; j < space[i].values.size(); ++j) {
+            valueAsText.setOrigin((valueAsText.getLocalBounds().left + valueAsText.getLocalBounds().width) / 2,
+                                  (valueAsText.getLocalBounds().height + valueAsText.getLocalBounds().height) / 2);
             if(space[i].values[j] != space[i].defaultValue) {
                 valueAsText.setString(to_string(space[i].values[j]));
                 valueAsText.setOrigin((valueAsText.getLocalBounds().left + valueAsText.getLocalBounds().width) / 2,
                                       (valueAsText.getLocalBounds().height + valueAsText.getLocalBounds().height) / 2);
                 valueAsText.setPosition(getValueCoordinates(i, j));
-                // valueAsText.setPosition(getValueCoordinates(i, j == 0 ? 0 : j == 1 ? (shapes[i].getPointCount()) / 2 : shapes[i].getPointCount() - 1));
+                //  valueAsText.setPosition(getValueCoordinates(i, j == 0 ? 0 : j == 1 ? (shapes[i].getPointCount()) / 2 : shapes[i].getPointCount() - 1));
                 window.draw(valueAsText);
             }
+        }
+    }
+    s_arrowR.setPosition(get2DWindowCoordinates(0));
+    s_arrowR.setScale(shapes[0].getLocalBounds().width / 768., shapes[0].getLocalBounds().height / 768.);
+    s_arrowR.setScale(0.05, 0.05);
+    for(size_t i = 0; i < space.size(); ++i) {
+        if(parent[i] != Space::NaN) {
+            s_arrowR.setPosition(shapes[i].getPosition());
+            s_arrowR.setRotation(getDegrees(shapes[i].getPosition(), shapes[parent[i]].getPosition()));
+            window.draw(s_arrowR);
         }
     }
 }
@@ -279,10 +339,13 @@ void SpaceRenderer::drawMaze() {
                          p2 = Point2Df(shapes[i].getPoint((j + 1) % shapes[i].getPointCount())) * Point2Df(shapes[i].getScale()) + Point2Df(shapes[i].getPosition());
                 drawThickLine(p1, p2, mazeThickness, colorScheme[MAZECOLOR]);
             }
+    if(space.tiling() == Space::AMORPHOUS)
+        drawWindowBorders();
 }
 // helper functions
 double SpaceRenderer::radiansToDegrees(double r) const { return r * (180 / M_PI); }
 double SpaceRenderer::degreesToRadians(double d) const { return d * M_PI / 180; }
+double SpaceRenderer::getDegrees(sf::Vector2f a, sf::Vector2f b) const { return radiansToDegrees(atan2(b.y - a.y, b.x - a.x)); }
 Vector2f SpaceRenderer::get2DWindowCoordinates(Point2Du p) const { return get2DWindowCoordinates(space.get1DCoordinates(p)); }
 Vector2f SpaceRenderer::get2DWindowCoordinates(size_t i) const {
     if(space.tiling() == Space::AMORPHOUS)
@@ -297,8 +360,11 @@ Vector2f SpaceRenderer::get2DWindowCoordinates(size_t i) const {
 }
 Point2Du SpaceRenderer::mouseTo2DSpaceCoordinates(Vector2f p) const { return space.get2DCoordinates(mouseTo1DSpaceCoordinates(p)); }
 size_t SpaceRenderer::mouseTo1DSpaceCoordinates(Vector2f p) const {
+    if(!isPointInsideWindow(Point2Df(p.x, p.y)))
+        return Space::NaN;
     if(_tiling == Space::SQUARE) {
-        return space.get1DCoordinates(Point2Du(floor(p.x / shapeSize.x), floor(p.y / shapeSize.y)));
+        size_t t = space.get1DCoordinates(Point2Du(floor(p.x / shapeSize.x), floor(p.y / shapeSize.y)));
+        return t >= space.size() ? Space::NaN : t;
     }
     for(size_t i = 0; i < shapes.size(); ++i) {
         if(isPointInsideShape(Point2Df(p), shapes[i])) {
@@ -360,3 +426,4 @@ Point2Df SpaceRenderer::lineWindowIntersection(Point2Df AV0, Point2Df AV1) {
            : (result = lineSegmentsIntersection(AV0, AV1, Point2Df(0, windowSize.y), Point2Df(0, 0)))                       ? *result
                                                                                                                             : AV1;
 }
+bool SpaceRenderer::isPointInsideWindow(Point2Df p) const { return p.x > 0 && p.y > 0 && p.x < window.getSize().x && p.y < window.getSize().y; }

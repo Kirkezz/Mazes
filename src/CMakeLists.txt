@@ -9,8 +9,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Pdf)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Pdf)
 find_package(SFML COMPONENTS system window graphics REQUIRED)
 find_package(Boost 1.40 COMPONENTS program_options REQUIRED)
 
@@ -26,6 +26,7 @@ set(PROJECT_SOURCES
         Space.h
         SpaceRenderer.h
         PointAnimation.h
+        SpaceProfiling.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -51,7 +52,7 @@ else()
     endif()
 endif()
 
-target_link_libraries(Mazes PRIVATE Qt${QT_VERSION_MAJOR}::Widgets PUBLIC sfml-window sfml-graphics Boost::program_options)
+target_link_libraries(Mazes PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Pdf PUBLIC sfml-window sfml-graphics Boost::program_options)
 
 set_target_properties(Mazes PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

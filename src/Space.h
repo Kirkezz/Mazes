@@ -48,7 +48,7 @@ public:
     Point2Du get2DCoordinates(size_t i) const;
     size_t get1DCoordinates(Point2Du p) const;
     bool stepByStepFill = false, stepByStepPath = false;
-    enum StepType { SETVALUE1 = 0, SETVALUE2, SETVALUE3, SETCOLOR, LINK, UNLINK, SETNEXTPATH };
+    enum StepType { SETVALUE1 = 0, SETVALUE2, SETVALUE3, SETCOLOR, LINK, UNLINK, SETNEXTPATH, SETPARENT };
     struct Step {
         Point2Du stepValue;
         StepType stepType;
@@ -79,6 +79,8 @@ public:
     static constexpr std::array fillArr = {&Space::clear,          &Space::recursiveBacktrackerMaze, &Space::EllersMaze,       &Space::KruskalsMaze,
                                            &Space::PrimsMaze,      &Space::recursiveDivisionMaze,    &Space::AldousBroderMaze, &Space::WilsonsMaze,
                                            &Space::huntAndKillMaze};
+    static constexpr std::array<std::array<bool, fillArr.size()>, 5> availableFillings = {
+        {{1}, {1, 1, 1, 1, 1, 1, 1, 1, 1}, {1, 1, 0, 1, 1, 0, 1, 1, 1}, {1, 1, 0, 1, 1, 0, 1, 1, 1}, {1, 1, 0, 1, 1, 0, 1, 1, 1}}};
     // traversing/pathfinding algorithms
     std::list<size_t> BFSFind(size_t from, size_t to);
     std::function<float(size_t, size_t)> calcWeightFunc; // user-defined function

@@ -197,7 +197,7 @@ void Space::horizontally() {
 
 void Space::recursiveBacktrackerMaze() {
     uniform_int_distribution<> ud(0, size() - 1);
-    size_t begin = 0, cur;
+    size_t begin = ud(dre), cur;
     deque<size_t> points({begin});
     vector<bool> visited(size(), false);
     addFillStep({points.front(), 1}, SETCOLOR);
@@ -220,14 +220,20 @@ void Space::EllersMaze() {
     size_t n = 0;
     for(size_t i = 0; i < _height; ++i) {
         for(size_t j = 0; j < _width; ++j)
-            if(!thisLine[j])
+            if(!thisLine[j]) {
                 thisLine[j] = ++n;
+                if(stepByStepFill)
+                    addFillStep({i * _width + j, thisLine[j]}, StepType(0), false);
+            }
         for(size_t j = 0; j < _width - 1; ++j) {
             if((i == _height - 1 || ud(dre) < EllersMazeVerticalProbability) && thisLine[j] != thisLine[j + 1]) {
                 link(i * _width + j, i * _width + j + 1);
                 for(size_t c = 0, t = thisLine[j + 1]; c < _width; ++c)
-                    if(thisLine[c] == t)
+                    if(thisLine[c] == t) {
+                        if(stepByStepFill)
+                            addFillStep({i * _width + c, thisLine[j]}, StepType(0), false);
                         thisLine[c] = thisLine[j];
+                    }
             }
         }
         auto calcWalls = [&](size_t v) {
@@ -240,14 +246,23 @@ void Space::EllersMaze() {
             for(size_t j = 0; j < _width; ++j) {
                 if(ud(dre) < EllersMazeVerticalProbability || count(thisLine.begin(), thisLine.end(), thisLine[j]) == 1) {
                     link(i * _width + j, (i + 1) * _width + j);
+                    if(stepByStepFill)
+                        addFillStep({(i + 1) * _width + j, thisLine[j]}, StepType(0), false);
                     nextLine[j] = thisLine[j];
                 }
             }
             for(size_t j = 0; j < _width; ++j) {
                 if(calcWalls(thisLine[j]) == 0) {
                     link(i * _width + j, (i + 1) * _width + j);
+                    if(stepByStepFill)
+                        addFillStep({(i + 1) * _width + j, thisLine[j]}, StepType(0), false);
                     nextLine[j] = thisLine[j];
                 }
+            }
+        }
+        if(stepByStepFill) {
+            for(size_t j = 0; j < _width; ++j) {
+                addFillStep({i * _width + j, Node::defaultValue}, StepType(0), false);
             }
         }
         thisLine = std::move(nextLine);
@@ -426,8 +441,6 @@ void Space::huntAndKillMaze() {
 list<size_t> Space::BFSFind(size_t from, size_t to) {
     if(from == to)
         return {};
-    vector<bool> discovered(size(), false);
-    discovered[from] = true;
     vector<size_t> parent(size(), -1);
     deque<size_t> d({NaN, from});
     while(!d.empty()) {
@@ -441,11 +454,11 @@ list<size_t> Space::BFSFind(size_t from, size_t to) {
             continue;
         }
         for(auto i : grid[back]->next) {
-            if(!discovered[i]) {
+            if(parent[i] == -1) {
                 d.push_front(i);
+                addPathStep({i, back}, SETPARENT, false);
                 parent[i] = back;
                 addPathStep({i, 1}, SETCOLOR, false);
-                discovered[i] = true;
                 if(i == to) {
                     return constructPath(parent, from, to);
                 }
@@ -459,7 +472,7 @@ std::list<size_t> Space::AStarFind(size_t from, size_t to) {
         return {};
     enum Costs { G = 1, H = 2, F = 0 };
     size_t current;
-    vector<size_t> parent(size(), -1), open;
+    vector<size_t> parent(size(), -1), open; // TODO: rewrite using priority queue (heap)
     open.reserve(size());
     open.push_back(from);
     setValue(from, G, 0, false);
@@ -481,6 +494,7 @@ std::list<size_t> Space::AStarFind(size_t from, size_t to) {
             if(closed[i])
                 continue;
             if(auto t = grid[min]->values[G] + calcWeightFunc(min, i); grid[i]->values[G] == Node::defaultValue || grid[i]->values[G] > t) {
+                addPathStep({i, min}, SETPARENT, false);
                 parent[i] = min;
                 setValue(i, G, t, false); // G cost = distance from starting node
                 if(grid[i]->values[H] == Node::defaultValue)

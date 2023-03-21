@@ -2,9 +2,10 @@
 
 #include "Space.h"
 #include "SpaceRenderer.h"
-#include <QColorDialog>
-#include <QFrame>
-#include <QMainWindow>
+#include <QtGui/QDesktopServices>
+#include <QtWidgets/QColorDialog>
+#include <QtWidgets/QFrame>
+#include <QtWidgets/QMainWindow>
 #include <array>
 #include <fstream>
 #include <random>
@@ -20,6 +21,7 @@ class SpaceGUI : public QMainWindow {
 public:
     SpaceGUI(Space& space, SpaceRenderer& renderer, QWidget* parent = nullptr);
     ~SpaceGUI();
+    void update();
 private slots:
     void on_tiling_currentIndexChanged(int index);
     void on_apply_clicked();
@@ -47,18 +49,22 @@ private slots:
     void on_secondColorButton_clicked();
     void on_thirdColorButton_clicked();
     void on_fourthColorButton_clicked();
+    void on_fifthColorButton_clicked();
     void on_saveToFileButton_clicked();
     void on_loadFromFileButton_clicked();
     void on_outlineThickness_valueChanged(double arg1);
     void on_curveThickness_valueChanged(double arg1);
     void on_pathThickness_valueChanged(double arg1);
     void on_mazeThickness_valueChanged(double arg1);
+    void on_mazeInfo_clicked();
+
+    void on_pathInfo_clicked();
 private:
     struct CustomizationData {
         sf::Color colors[SpaceRenderer::NUM_COLORS] = {sf::Color(0, 30, 50),   sf::Color::White,        sf::Color::Blue,         sf::Color(173, 255, 152),
                                                        sf::Color::Magenta,     sf::Color(26, 113, 185), sf::Color(255, 42, 109), sf::Color(223, 101, 148),
-                                                       sf::Color(5, 217, 232), sf::Color(1, 25, 15),    sf::Color(255, 42, 109)};
-        std::array<float, 4> thicknesses = {2.f, 2.f, 3.f, 2.f};
+                                                       sf::Color(5, 217, 232), sf::Color(1, 25, 15),    sf::Color(255, 42, 109), sf::Color::Green};
+        std::array<float, 4> thicknesses = {2.f, 2.f, 3.f, 4.f};
     };
     void loadCD(const CustomizationData& cd);
     Ui::SpaceGUI* ui;

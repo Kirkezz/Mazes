@@ -21,9 +21,11 @@ int main(int argc, char** argv) {
     QApplication app(argc, argv);
     SpaceGUI QtWindow(space, renderer);
     QtWindow.show();
+    // size_t scrcnt = 0;
     while(SFMLWindow.isOpen()) {
         if(!QtWindow.isVisible())
             SFMLWindow.close();
+        SFMLWindow.clear(renderer.colorScheme[SpaceRenderer::BACKGROUNDCOLOR]);
         Vector2f mouse;
         Event event;
         while(SFMLWindow.pollEvent(event)) {
@@ -40,6 +42,21 @@ int main(int argc, char** argv) {
                     break;
                 case Keyboard::F:
                     space.floodFill();
+                    break;
+                case Keyboard::A:
+                    renderer.setAllPoints();
+                    break;
+                case Keyboard::S:
+                    renderer.draw();
+                    SFMLWindow.display();
+                    renderer.saveScreenshot("screenshots/" + to_string(uniform_int_distribution<>()(space.dre)) + ".png");
+                    // renderer.saveScreenshot("screenshots/bfs" + to_string(++scrcnt) + ".png");
+                    break;
+                    // case Keyboard::R:
+                    // scrcnt = 0;
+                    // break;
+                case Keyboard::Delete:
+                    renderer.deleteSelectedPoint();
                     break;
                 default:
                     break;
@@ -62,10 +79,10 @@ int main(int argc, char** argv) {
                 }
             }
         }
-        SFMLWindow.clear(renderer.colorScheme[SpaceRenderer::BACKGROUNDCOLOR]);
         renderer.update();
         renderer.draw();
         SFMLWindow.display();
+        QtWindow.update();
         app.processEvents();
     }
 }
