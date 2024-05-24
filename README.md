@@ -1,6 +1,18 @@
+# Mazes
+
 Maze Visualizer in C++ with support for visualization of pathfinding algorithms and maze generation, customization, and screenshot saving.
 
+## Build
+
 Dependencies: C++20, SFML, Qt, Boost.
+
+```
+cmake -S . -B build
+cmake --build build --config Release
+cd build/bin/
+```
+
+## Usage
 
 Supported grids: orthogonal, hexagonal, Voronoi diagram.
 
@@ -9,5 +21,3 @@ Supported maze generation algorithms: Recursive Backtracker algorithm, Eller's a
 Supported pathfinding algorithms: BFS, A*.
 
 Interface languages supported: Russian, English (translation is not finished yet, but will be available soon).
-
-For more information and to download the executable file, go to https://mazes.kirkezz.ru/.
