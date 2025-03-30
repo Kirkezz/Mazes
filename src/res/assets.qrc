@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/resource">
+        <file>assets/arial_bolditalicmt.ttf</file>
+        <file>assets/arrowR.png</file>
+    </qresource>
+</RCC>

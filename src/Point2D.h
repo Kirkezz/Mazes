@@ -2,11 +2,11 @@
 #include <SFML/System/Vector2.hpp>
 #include <cmath>
 #include <concepts>
-template <typename T> struct Point2D {
+/// A helper class that represents coordinates or size.
+template<typename T>
+struct Point2D {
     T x, y;
-    explicit Point2D(sf::Vector2f p)
-        requires std::same_as<T, float>
-        : x(p.x), y(p.y) {}
+    explicit Point2D(sf::Vector2<T> p) : x(p.x), y(p.y) {}
     Point2D() : x(), y() {}
     Point2D(T x, T y) : x(x), y(y) {}
     Point2D(T v) : x(v), y(v) {}
@@ -41,12 +41,12 @@ template <typename T> struct Point2D {
     {
         return std::isfinite(x) && std::isfinite(y);
     }
-    operator sf::Vector2f() const
-        requires std::same_as<T, float>
-    {
-        return sf::Vector2f(x, y);
+    template<typename U>
+    operator sf::Vector2<U>() const {
+        return sf::Vector2<U>(x, y);
     }
-    float distance(const Point2D<T>& other) const { return sqrt(pow(x - other.x, 2) + pow(y - other.y, 2)); }
+    float distance(const Point2D<T>& other) const { return sqrt(pow(x - other.x, 2.) + pow(y - other.y, 2.)); }
+    static float distance(const Point2D<T>& fst, const Point2D<T>& snd) { return fst.distance(snd); }
     bool operator<(const Point2D<T>& other) const { return (x != other.x) ? (x > other.x) : (other.y < y); }
 };
 using Point2Du = Point2D<size_t>;

@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/resource">
+        <file>translation/Mazes_EN.qm</file>
+        <file>translation/Mazes_RU.qm</file>
+    </qresource>
+</RCC>

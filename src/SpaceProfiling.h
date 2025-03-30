@@ -2,6 +2,7 @@
 #include "Space.h"
 #include <chrono>
 #include <map>
+/// A class for measuring the performance of algorithms.
 struct SpaceProfiling {
     static Space* spacePtr;
     static const std::map<size_t, std::string> mazes;
@@ -13,7 +14,7 @@ struct SpaceProfiling {
     }
     static auto printMazeAverageTime(size_t maze, size_t n) {
         auto total = getMazeTime(maze);
-        for(size_t i = 1; i < n; ++i) {
+        for (size_t i = 1; i < n; ++i) {
             total += getMazeTime(maze);
         }
         std::cout << maze << ") t average = " << total / n << "; n = " << n << std::endl;

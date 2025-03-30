@@ -18,8 +18,8 @@
   </property>
   <property name="maximumSize">
    <size>
-    <width>448</width>
-    <height>768</height>
+    <width>512</width>
+    <height>965</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -37,110 +37,103 @@
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
-        <string>Основное</string>
+        <string>Main settings</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
-        <item row="4" column="0">
-         <widget class="QGroupBox" name="groupBox_3">
+        <item row="1" column="0">
+         <widget class="QGroupBox" name="groupBox_2">
           <property name="title">
-           <string>Отображение графических элементов</string>
+           <string>Maze settings</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_3">
-           <item row="0" column="0">
-            <widget class="QCheckBox" name="checkBox_2">
-             <property name="text">
-              <string>Сетка</string>
-             </property>
-             <property name="tristate">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QCheckBox" name="checkBox_5">
-             <property name="text">
-              <string>Ребра графа лабиринта</string>
-             </property>
-            </widget>
-           </item>
+          <layout class="QGridLayout" name="gridLayout_2">
            <item row="1" column="0">
-            <widget class="QCheckBox" name="checkBox_3">
+            <widget class="QLabel" name="label_6">
              <property name="text">
-              <string>Кратчайший путь</string>
+              <string>Maze generation algorithm</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="QCheckBox" name="checkBox_6">
-             <property name="text">
-              <string>Точки</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QCheckBox" name="checkBox_4">
-             <property name="text">
-              <string>Стены лабиринта</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QCheckBox" name="checkBox_7">
-             <property name="text">
-              <string>Отладочная информация</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QGroupBox" name="groupBox_4">
-          <property name="title">
-           <string>Настройки нахождения кратчайшего пути</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_4">
-           <item row="2" column="1">
-            <widget class="QDoubleSpinBox" name="pathAlgDelay">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
+           <item row="1" column="2">
+            <widget class="QComboBox" name="mazeAlg">
+             <property name="minimumSize">
+              <size>
+               <width>169</width>
+               <height>0</height>
+              </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>185</width>
+               <width>134</width>
                <height>16777215</height>
               </size>
              </property>
+             <item>
+              <property name="text">
+               <string/>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Recursive backtracker</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Eller's algorithm</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Randomized Kruskal's algorithm</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Prim's algorithm</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Recursive Division</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Aldous-Broder algorithm</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Wilson's algorithm</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Hunt-and-Kill</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Growing tree algorithm</string>
+              </property>
+             </item>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_9">
-             <property name="text">
-              <string>Интервал визуализации</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_8">
-             <property name="text">
-              <string>Алгоритм нахождения пути</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="QPushButton" name="pathInfo">
+           <item row="3" column="0" colspan="2">
+            <widget class="QPushButton" name="mazeSettings">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="text">
+              <string>Settings</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="3">
+            <widget class="QPushButton" name="mazeInfo">
              <property name="maximumSize">
               <size>
                <width>26</width>
@@ -152,34 +145,16 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QCheckBox" name="isPathAlgVisualization">
-             <property name="text">
-              <string>Визуализировать</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="pathAlg">
-             <item>
-              <property name="text">
-               <string>Поиск в ширину</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Алгоритм A*</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="1" column="1" colspan="2">
-            <widget class="QCheckBox" name="isManualPathStep">
-             <property name="enabled">
-              <bool>false</bool>
+           <item row="3" column="2" colspan="2">
+            <widget class="QPushButton" name="apply">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
              </property>
              <property name="text">
-              <string>Построение на пробел</string>
+              <string>Apply</string>
              </property>
             </widget>
            </item>
@@ -189,20 +164,20 @@
         <item row="0" column="0">
          <widget class="QGroupBox" name="groupBox">
           <property name="title">
-           <string>Геометрия сетки</string>
+           <string>Grid geometry</string>
           </property>
           <layout class="QGridLayout" name="gridLayout">
            <item row="1" column="0" colspan="2">
             <widget class="QLabel" name="label_4">
              <property name="text">
-              <string>Ширина ячейки</string>
+              <string>Cell width</string>
              </property>
             </widget>
            </item>
            <item row="2" column="0" colspan="2">
             <widget class="QLabel" name="label_5">
              <property name="text">
-              <string>Высота ячейки</string>
+              <string>Cell height</string>
              </property>
             </widget>
            </item>
@@ -222,21 +197,21 @@
            <item row="0" column="0">
             <widget class="QLabel" name="label_3">
              <property name="text">
-              <string>Тип</string>
+              <string>Tiling</string>
              </property>
             </widget>
            </item>
            <item row="2" column="4">
             <widget class="QLabel" name="label_2">
              <property name="text">
-              <string>Строк</string>
+              <string>Rows</string>
              </property>
             </widget>
            </item>
            <item row="1" column="4">
             <widget class="QLabel" name="label">
              <property name="text">
-              <string>Столбцов</string>
+              <string>Columns</string>
              </property>
             </widget>
            </item>
@@ -297,22 +272,22 @@
              </item>
              <item>
               <property name="text">
-               <string>Прямоугольная (ортогональная)</string>
+               <string>Orthogonal</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Шестиугольная (гексагональная)</string>
+               <string>Hexagonal</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Диаграма Вороного (случайно)</string>
+               <string>Voronoi diagram (random)</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Диаграма Вороного (по точкам)</string>
+               <string>Voronoi diagram (points)</string>
               </property>
              </item>
             </widget>
@@ -320,14 +295,138 @@
           </layout>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QGroupBox" name="groupBox_2">
+        <item row="7" column="0">
+         <widget class="QGroupBox" name="groupBox_3">
           <property name="title">
-           <string>Настройки лабиринта</string>
+           <string>Graphic elements</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="1" column="2">
-            <widget class="QPushButton" name="mazeInfo">
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="checkBox_2">
+             <property name="text">
+              <string>Grid</string>
+             </property>
+             <property name="tristate">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="checkBox_3">
+             <property name="text">
+              <string>Shortest path</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QCheckBox" name="checkBox_7">
+             <property name="text">
+              <string>Debug info</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QCheckBox" name="checkBox_4">
+             <property name="text">
+              <string>Maze walls</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="checkBox_6">
+             <property name="text">
+              <string>Dots</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="checkBox_5">
+             <property name="text">
+              <string>Edges of a maze graph</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QGroupBox" name="groupBox_7">
+          <property name="title">
+           <string>Visualization</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_10">
+           <item row="1" column="0" colspan="2">
+            <widget class="QPushButton" name="visualizationSettings">
+             <property name="text">
+              <string>Settings</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="isVisualization">
+             <property name="text">
+              <string>Visualize</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="isSonification">
+             <property name="text">
+              <string>Sonify</string>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="checked">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QGroupBox" name="groupBox_4">
+          <property name="title">
+           <string>Pathfinding settings</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_4">
+           <item row="2" column="0" colspan="3">
+            <widget class="QPushButton" name="pathfindingSettings">
+             <property name="text">
+              <string>Settings</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_8">
+             <property name="text">
+              <string>Pathfinding algorithm</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="pathAlg">
+             <item>
+              <property name="text">
+               <string>Breadth-first search</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Algorithm A*</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QPushButton" name="pathInfo">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="maximumSize">
               <size>
                <width>26</width>
@@ -339,133 +438,27 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="1" colspan="2">
-            <widget class="QCheckBox" name="isManualMazeStep">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>Построение на пробел</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_7">
-             <property name="text">
-              <string>Интервал визуализации</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QCheckBox" name="isSBSF">
-             <property name="text">
-              <string>Визуализировать</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QComboBox" name="mazeAlg">
-             <property name="minimumSize">
-              <size>
-               <width>169</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>134</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <item>
-              <property name="text">
-               <string/>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Recursive backtracker (Рандомизированный поиск в глубину)</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Алгоритм Эллера</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Рандомизированный алгоритм Краскала</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Алгоритм Прима</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Рекурсивное деление</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Алгоритм Олдоса-Бродера</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Алгоритм Уилсона</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Hunt-and-Kill</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QDoubleSpinBox" name="mazeAlgDelay">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_6">
-             <property name="text">
-              <string>Алгоритм построения</string>
-             </property>
-            </widget>
-           </item>
           </layout>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QPushButton" name="apply">
-          <property name="text">
-           <string>Применить</string>
-          </property>
          </widget>
         </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
-        <string>Кастомизация</string>
+        <string>Customization</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_9">
         <item row="2" column="1">
          <widget class="QPushButton" name="loadFromFileButton">
           <property name="text">
-           <string>Загрузить из файла</string>
+           <string>Load from file</string>
           </property>
          </widget>
         </item>
         <item row="0" column="0" colspan="2">
          <widget class="QGroupBox" name="groupBox_5">
           <property name="title">
-           <string>Цветовая палитра</string>
+           <string>Color palette</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_6">
            <item row="0" column="0">
@@ -493,7 +486,7 @@
            <item row="0" column="1">
             <widget class="QPushButton" name="backgroundColorButton">
              <property name="text">
-              <string>Изменить цвет фона</string>
+              <string>Change background color</string>
              </property>
             </widget>
            </item>
@@ -522,7 +515,7 @@
            <item row="1" column="1">
             <widget class="QPushButton" name="outlineColorButton">
              <property name="text">
-              <string>Изменить цвет линий сетки</string>
+              <string>Change grid line color</string>
              </property>
             </widget>
            </item>
@@ -551,7 +544,7 @@
            <item row="2" column="1">
             <widget class="QPushButton" name="curveColorButton">
              <property name="text">
-              <string>Изменить цвет рёбер графа лабиринта</string>
+              <string>Change maze edges color</string>
              </property>
             </widget>
            </item>
@@ -580,7 +573,7 @@
            <item row="3" column="1">
             <widget class="QPushButton" name="mazeColorButton">
              <property name="text">
-              <string>Изменить цвет стен лабиринта</string>
+              <string>Change maze walls color</string>
              </property>
             </widget>
            </item>
@@ -609,7 +602,7 @@
            <item row="4" column="1">
             <widget class="QPushButton" name="pointsColorButton">
              <property name="text">
-              <string>Изменить цвет точек</string>
+              <string>Change points color</string>
              </property>
             </widget>
            </item>
@@ -638,7 +631,7 @@
            <item row="5" column="1">
             <widget class="QPushButton" name="pathColorButton">
              <property name="text">
-              <string>Изменить цвет кратчайшего пути</string>
+              <string>Change shortest path color</string>
              </property>
             </widget>
            </item>
@@ -667,7 +660,7 @@
            <item row="6" column="1">
             <widget class="QPushButton" name="shapeColorButton">
              <property name="text">
-              <string>Цвет №0 (стандартный цвет сетки)</string>
+              <string>Color #0 (default grid color)</string>
              </property>
             </widget>
            </item>
@@ -696,7 +689,7 @@
            <item row="7" column="1">
             <widget class="QPushButton" name="firstColorButton">
              <property name="text">
-              <string>Цвет визуализации №1</string>
+              <string>Visualization color #1</string>
              </property>
             </widget>
            </item>
@@ -725,7 +718,7 @@
            <item row="8" column="1">
             <widget class="QPushButton" name="secondColorButton">
              <property name="text">
-              <string>Цвет визуализации №2</string>
+              <string>Visualization color #2</string>
              </property>
             </widget>
            </item>
@@ -754,7 +747,7 @@
            <item row="9" column="1">
             <widget class="QPushButton" name="thirdColorButton">
              <property name="text">
-              <string>Цвет визуализации №3</string>
+              <string>Visualization color #3</string>
              </property>
             </widget>
            </item>
@@ -783,7 +776,7 @@
            <item row="10" column="1">
             <widget class="QPushButton" name="fourthColorButton">
              <property name="text">
-              <string>Цвет визуализации №4</string>
+              <string>Visualization color #4</string>
              </property>
             </widget>
            </item>
@@ -812,7 +805,7 @@
            <item row="11" column="1">
             <widget class="QPushButton" name="fifthColorButton">
              <property name="text">
-              <string>Цвет отладочного текста</string>
+              <string>Debug text color</string>
              </property>
             </widget>
            </item>
@@ -822,41 +815,11 @@
         <item row="1" column="0" colspan="2">
          <widget class="QGroupBox" name="groupBox_6">
           <property name="title">
-           <string>Числовые характеристики</string>
+           <string>Numerical values</string>
           </property>
           <layout class="QGridLayout" name="gridLayout_8">
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_10">
-             <property name="text">
-              <string>Толщина линий сетки</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QDoubleSpinBox" name="outlineThickness">
-             <property name="minimumSize">
-              <size>
-               <width>76</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>76</width>
-               <height>16777215</height>
-              </size>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_11">
-             <property name="text">
-              <string>Толщина рёбер графа лабиринта</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QDoubleSpinBox" name="pathThickness">
+           <item row="1" column="1">
+            <widget class="QDoubleSpinBox" name="curveThickness">
              <property name="minimumSize">
               <size>
                <width>76</width>
@@ -874,14 +837,21 @@
            <item row="2" column="0">
             <widget class="QLabel" name="label_12">
              <property name="text">
-              <string>Толщина кратчайшего пути</string>
+              <string>Shortest path thickness</string>
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_13">
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_11">
              <property name="text">
-              <string>Толщина стен лабиринта</string>
+              <string>Maze graph edge thickness</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>Grid line thickness</string>
              </property>
             </widget>
            </item>
@@ -901,8 +871,8 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="QDoubleSpinBox" name="curveThickness">
+           <item row="2" column="1">
+            <widget class="QDoubleSpinBox" name="pathThickness">
              <property name="minimumSize">
               <size>
                <width>76</width>
@@ -917,13 +887,53 @@
              </property>
             </widget>
            </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_13">
+             <property name="text">
+              <string>Maze walls thickness</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="outlineThickness">
+             <property name="minimumSize">
+              <size>
+               <width>76</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>76</width>
+               <height>16777215</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>Antialiasing level</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QSpinBox" name="antialiasingLevel">
+             <property name="maximum">
+              <number>64</number>
+             </property>
+             <property name="value">
+              <number>4</number>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
         <item row="2" column="0">
          <widget class="QPushButton" name="saveToFileButton">
           <property name="text">
-           <string>Сохранить в файл</string>
+           <string>Save to file</string>
           </property>
          </widget>
         </item>
@@ -934,6 +944,34 @@
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>448</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuLanguage">
+    <property name="title">
+     <string>Language</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuActions">
+    <property name="title">
+     <string>Actions</string>
+    </property>
+    <addaction name="actionStart_Demo"/>
+   </widget>
+   <addaction name="menuLanguage"/>
+   <addaction name="menuActions"/>
+  </widget>
+  <action name="actionStart_Demo">
+   <property name="text">
+    <string>Start Demo</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
