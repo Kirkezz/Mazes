@@ -25,8 +25,10 @@ Interface languages supported: English, Russian.
 
 ## Demo
 
+https://www.youtube.com/watch?v=Yr6sOimsF-E
 [![Demo](http://i.ytimg.com/vi/Yr6sOimsF-E/hqdefault.jpg)](https://www.youtube.com/watch?v=Yr6sOimsF-E)
 
+https://www.youtube.com/watch?v=bniqlOn-6-4
 [![Bonus](http://i.ytimg.com/vi/bniqlOn-6-4/hqdefault.jpg)](https://www.youtube.com/watch?v=bniqlOn-6-4)
 
 ## Releases
